@@ -18,47 +18,47 @@ import java.util.HashSet;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UserRepository repository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
+        private final UserRepository repository;
+        private final PasswordEncoder passwordEncoder;
+        private final JwtService jwtService;
+        private final AuthenticationManager authenticationManager;
 
-    public AuthResponse register(RegisterRequest request) {
-        if (repository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+        public AuthResponse register(RegisterRequest request) {
+                if (repository.existsByUsername(request.getUsername())) {
+                        throw new RuntimeException("Username already exists");
+                }
+                if (repository.existsByEmail(request.getEmail())) {
+                        throw new RuntimeException("Email already exists");
+                }
+
+                var user = User.builder()
+                                .username(request.getUsername())
+                                .email(request.getEmail())
+                                .password(passwordEncoder.encode(request.getPassword()))
+                                .roles(request.getRoles() != null ? request.getRoles() : new HashSet<>())
+                                .currentStreak(1)
+                                .longestStreak(1)
+                                .lastLoginDate(java.time.LocalDateTime.now())
+                                .build();
+                repository.save(user);
+                var jwtToken = jwtService.generateToken(user);
+                return AuthResponse.builder()
+                                .token(jwtToken)
+                                .username(user.getUsername())
+                                .build();
         }
-        if (repository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+
+        public AuthResponse login(LoginRequest request) {
+                authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getUsername(),
+                                                request.getPassword()));
+                var user = repository.findByUsername(request.getUsername())
+                                .orElseThrow();
+                var jwtToken = jwtService.generateToken(user);
+                return AuthResponse.builder()
+                                .token(jwtToken)
+                                .username(user.getUsername())
+                                .build();
         }
-
-        var user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(request.getRoles() != null ? request.getRoles() : new HashSet<>())
-                .dailyStreak(0)
-                .build();
-        repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        return AuthResponse.builder()
-                .token(jwtToken)
-                .username(user.getUsername())
-                .build();
-    }
-
-    public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
-        var user = repository.findByUsername(request.getUsername())
-                .orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        return AuthResponse.builder()
-                .token(jwtToken)
-                .username(user.getUsername())
-                .build();
-    }
 }

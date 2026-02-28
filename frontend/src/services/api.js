@@ -26,7 +26,8 @@ export const authService = {
         const response = await api.post('/auth/signup', userData);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.user || userData.email));
+            // The backend sends 'username' in AuthResponse
+            localStorage.setItem('user', JSON.stringify(response.data.username || userData.username));
         }
         return response.data;
     },
@@ -34,8 +35,8 @@ export const authService = {
         const response = await api.post('/auth/login', credentials);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
-            // Assuming back-end sends user data, if not store email
-            localStorage.setItem('user', JSON.stringify(response.data.user || credentials.email));
+            // The backend sends 'username' in AuthResponse
+            localStorage.setItem('user', JSON.stringify(response.data.username || credentials.username));
         }
         return response.data;
     },
@@ -48,7 +49,13 @@ export const authService = {
     },
     getCurrentUser: () => {
         const user = localStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
+        if (!user || user === 'undefined') return null;
+        try {
+            return JSON.parse(user);
+        } catch (e) {
+            console.error('Error parsing user from localStorage', e);
+            return null;
+        }
     }
 };
 

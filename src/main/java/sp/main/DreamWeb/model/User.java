@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,7 +32,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    private int dailyStreak;
+    private int currentStreak = 0;
+
+    private int longestStreak = 0;
+
+    private LocalDateTime lastLoginDate;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))

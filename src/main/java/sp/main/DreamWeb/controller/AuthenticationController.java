@@ -20,15 +20,13 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> register(
-            @RequestBody RegisterRequest request
-    ) {
+            @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(service.register(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
-            @RequestBody LoginRequest request
-    ) {
+            @RequestBody LoginRequest request) {
         return ResponseEntity.ok(service.login(request));
     }
 }

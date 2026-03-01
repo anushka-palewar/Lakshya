@@ -42,4 +42,10 @@ public class DreamController {
         DreamResponse daily = service.getDailySelection();
         return daily != null ? ResponseEntity.ok(daily) : ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/daily-focus")
+    public ResponseEntity<DreamResponse> getDailyFocusDream() {
+        DreamResponse dailyFocus = service.getDailyFocusDream();
+        return dailyFocus != null ? ResponseEntity.ok(dailyFocus) : ResponseEntity.noContent().build();
+    }
 }

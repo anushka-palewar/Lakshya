@@ -23,9 +23,15 @@ public class Dream {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
     private LocalDate dueDate;
+    private String category;
+    private String priority; // Low, Medium, High
+    @Column(columnDefinition = "TEXT")
+    private String visionKeywords;
+    private LocalDateTime lastFocusedAt;
 
     @Builder.Default
     private boolean isAchieved = false;

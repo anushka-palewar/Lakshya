@@ -13,9 +13,12 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
-        Map<String, String> error = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+        Map<String, Object> error = new HashMap<>();
         error.put("error", ex.getMessage());
+        error.put("type", ex.getClass().getSimpleName());
+        // For debugging, we'll keep it as BAD_REQUEST as that's what user is seeing,
+        // but let's make it clearer.
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
@@ -27,9 +30,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
-        Map<String, String> error = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
+        Map<String, Object> error = new HashMap<>();
         error.put("error", "An unexpected error occurred: " + ex.getMessage());
+        error.put("type", ex.getClass().getSimpleName());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

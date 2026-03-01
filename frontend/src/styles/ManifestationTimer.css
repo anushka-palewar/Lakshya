@@ -1,0 +1,216 @@
+/* Manifestation Timer Section */
+.manifestation-timer-section {
+  background: linear-gradient(
+    135deg,
+    #FAFAF8 0%,
+    #F5F1E8 50%,
+    #F0EBDE 100%
+  );
+}
+
+.timer-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.timer-center .section-title {
+  margin-bottom: var(--space-md);
+}
+
+/* Timer Wrapper */
+.timer-wrapper {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  margin: var(--space-xl) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SVG Circle */
+.timer-circle {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.timer-circle-bg {
+  fill: none;
+  stroke: var(--border-soft);
+  stroke-width: 8;
+}
+
+.timer-circle-progress {
+  fill: none;
+  stroke: url(#goldGradient);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+  stroke-dasharray: 565.48px;
+}
+
+/* Timer Display */
+.timer-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.timer-time {
+  font-family: var(--font-sans);
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.timer-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Controls */
+.timer-controls {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-xl);
+}
+
+.timer-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--border-soft);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.timer-btn:hover:not(:disabled) {
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+  background: rgba(212, 160, 23, 0.05);
+}
+
+.timer-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Main Button - Play/Pause */
+.timer-btn-main {
+  width: 80px;
+  height: 80px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold-accent) 0%, #B8860B 100%);
+  color: white;
+  font-size: 28px;
+  box-shadow: 0 10px 30px rgba(212, 160, 23, 0.3);
+}
+
+.timer-btn-main:hover:not(:disabled) {
+  border-color: transparent;
+  background: linear-gradient(135deg, #E5B31D 0%, #C99A0F 100%);
+  box-shadow: 0 15px 40px rgba(212, 160, 23, 0.4);
+  transform: scale(1.05);
+}
+
+.timer-btn-main:disabled {
+  opacity: 0.6;
+}
+
+/* Sound Button States */
+.timer-btn.sound-enabled {
+  color: var(--gold-accent);
+  border-color: var(--gold-accent);
+  background: rgba(212, 160, 23, 0.05);
+}
+
+.timer-btn.sound-disabled {
+  color: var(--text-muted);
+}
+
+/* Timer Message */
+.timer-message {
+  margin-top: var(--space-lg);
+  font-size: 16px;
+  color: var(--text-muted);
+  font-style: italic;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timer-wrapper {
+    width: 260px;
+    height: 260px;
+  }
+
+  .timer-time {
+    font-size: 44px;
+  }
+
+  .timer-btn-main {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+  }
+
+  .timer-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .timer-controls {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .timer-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+
+  .timer-time {
+    font-size: 36px;
+  }
+
+  .timer-label {
+    font-size: 12px;
+  }
+
+  .timer-btn-main {
+    width: 56px;
+    height: 56px;
+    font-size: 18px;
+  }
+
+  .timer-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,20 @@
+.toast-wrap{
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:9999;
+}
+.toast{
+  background: rgba(0,0,0,0.8);
+  color:#fff;
+  padding:10px 14px;
+  border-radius:8px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.2);
+  font-size:14px;
+}
+.toast-success{ background: #2ecc71; }
+.toast-error{ background: #e74c3c; }
+.toast-info{ background: #34495e; }

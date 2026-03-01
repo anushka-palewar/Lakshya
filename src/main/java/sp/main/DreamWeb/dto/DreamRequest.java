@@ -15,5 +15,8 @@ public class DreamRequest {
     private String description;
     private String imageUrl;
     private LocalDate dueDate;
+    private String category;
+    private String priority;
+    private String visionKeywords;
     private boolean isAchieved;
 }

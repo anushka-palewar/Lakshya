@@ -1,0 +1,64 @@
+/* Dashboard Layout */
+.dashboard {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.dashboard-main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global Section Styles */
+.section {
+  width: 100%;
+  padding: var(--space-section) 0;
+  scroll-margin-top: var(--navbar-height);
+}
+
+.section:nth-child(even) {
+  background: var(--bg-primary);
+}
+
+/* Container Max */
+.container-max {
+  max-width: var(--container-max);
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+/* Smooth scrolling for whole page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .container-max {
+    max-width: 100%;
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 60px 0;
+  }
+
+  .container-max {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 40px 0;
+  }
+
+  .container-max {
+    padding: 0 12px;
+  }
+}

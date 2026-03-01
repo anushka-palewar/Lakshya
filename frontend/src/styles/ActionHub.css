@@ -1,0 +1,93 @@
+/* Action Hub Section */
+.action-hub-section {
+  background: var(--bg-primary);
+}
+
+/* Action Grid */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
+}
+
+/* Action Card */
+.action-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(31, 31, 31, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+}
+
+.action-card:hover {
+  box-shadow: 0 12px 35px rgba(31, 31, 31, 0.12);
+  transform: translateY(-4px);
+}
+
+.action-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-card-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.action-card-subtitle {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Locked State */
+.action-card-locked {
+  position: relative;
+  opacity: 0.7;
+}
+
+.action-card-blur-overlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 5;
+  border-radius: var(--radius-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .action-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .action-card {
+    min-height: 260px;
+    padding: var(--space-lg);
+  }
+
+  .action-card-title {
+    font-size: 20px;
+  }
+
+  .action-card-subtitle {
+    font-size: 14px;
+  }
+}

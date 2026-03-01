@@ -17,6 +17,9 @@ public class DreamResponse {
     private String description;
     private String imageUrl;
     private LocalDate dueDate;
+    private String category;
     private boolean isAchieved;
+    private int progress; // computed percentage
     private LocalDateTime createdAt;
+    private LocalDateTime lastFocusedAt;
 }

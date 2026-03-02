@@ -1,8 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/HeroSection.css';
 
-export default function HeroSection({ onCtaClick }) {
+export default function HeroSection({ onCtaClick, gratitudeCompletedToday }) {
+  const navigate = useNavigate();
+
+  const handleManifestationClick = () => {
+    if (!gratitudeCompletedToday) {
+      navigate('/gratitude');
+    } else {
+      onCtaClick();
+    }
+  };
+
   return (
     <section className="hero-section">
       <div className="hero-background">
@@ -40,8 +51,16 @@ export default function HeroSection({ onCtaClick }) {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="hero-buttons"
         >
-          <button className="btn-primary btn-hero-primary" onClick={onCtaClick}>
-            Start Your Morning Manifestation ✨
+          <button 
+            className={`btn-primary btn-hero-primary ${!gratitudeCompletedToday ? 'gratitude-required' : ''}`}
+            onClick={handleManifestationClick}
+            title={!gratitudeCompletedToday ? "Complete your gratitude first" : ""}
+          >
+            {!gratitudeCompletedToday ? (
+              <>Complete Daily Gratitude 🙏</>
+            ) : (
+              <>Start Your Morning Manifestation ✨</>
+            )}
           </button>
           <button className="btn-secondary btn-hero-secondary">
             Explore Dream Stream

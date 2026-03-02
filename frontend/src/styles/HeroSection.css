@@ -110,6 +110,27 @@
   min-width: 280px;
 }
 
+/* Gratitude Required State */
+.btn-hero-primary.gratitude-required {
+  background: linear-gradient(135deg, #D4A643 0%, #B8860B 100%);
+  border-color: rgba(184, 134, 11, 0.3);
+  animation: pulse-gratitude 2s ease-in-out infinite;
+}
+
+.btn-hero-primary.gratitude-required:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(184, 134, 11, 0.4);
+}
+
+@keyframes pulse-gratitude {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(184, 134, 11, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(184, 134, 11, 0);
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .hero-section {

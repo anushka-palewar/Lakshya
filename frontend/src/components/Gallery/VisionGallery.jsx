@@ -11,9 +11,10 @@ import {
     LayoutList,
     Sparkles,
     ShieldCheck,
-    X
+    X,
+    Lock
 } from 'lucide-react';
-import { dreamService } from '../../services/api';
+import { dreamService, gratitudeService } from '../../services/api';
 
 const VisionGallery = () => {
     const navigate = useNavigate();
@@ -21,18 +22,23 @@ const VisionGallery = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filter, setFilter] = useState('all');
     const [loading, setLoading] = useState(true);
+    const [gratitudeCompletedToday, setGratitudeCompletedToday] = useState(false);
 
     useEffect(() => {
-        const fetchDreams = async () => {
+        const fetchData = async () => {
             try {
-                const response = await dreamService.getDreams();
-                setDreams(response.data);
+                const [dreamsRes, gratitudeRes] = await Promise.all([
+                    dreamService.getDreams(),
+                    gratitudeService.getTodayStatus()
+                ]);
+                setDreams(dreamsRes.data);
+                setGratitudeCompletedToday(gratitudeRes.data?.completed || false);
             } catch (err) {
             } finally {
                 setLoading(false);
             }
         };
-        fetchDreams();
+        fetchData();
     }, []);
 
     const filteredDreams = dreams.filter(dream => {
@@ -43,62 +49,104 @@ const VisionGallery = () => {
     });
 
     return (
-        <div className="min-h-screen bg-[#F8F6F2] pt-32 pb-40 px-8 selection:bg-zen-gold/20">
-            {/* Header Section */}
-            <div className="max-w-7xl mx-auto mb-32 space-y-12 text-center">
-                <motion.button
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    onClick={() => navigate('/dashboard')}
-                    className="group flex items-center gap-4 text-charcoal/30 hover:text-zen-gold transition-all mx-auto px-6 py-2 rounded-full border border-charcoal/5 bg-white shadow-sm"
-                >
-                    <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-[10px] uppercase tracking-[0.5em] font-black">Return to Sanctuary</span>
-                </motion.button>
-
+        <div className="min-h-screen bg-[#F8F6F2] pt-32 pb-40 px-8 selection:bg-zen-gold/20 relative">
+            {/* Gratitude Lock Overlay */}
+            {!gratitudeCompletedToday && (
                 <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center pt-32"
                 >
-                    <h1 className="heading-serif text-8xl text-charcoal mb-4 tracking-tight">The Vision <span className="text-zen-gold italic block mt-2">Gallery</span></h1>
-                    <p className="text-charcoal/40 font-light text-lg tracking-[0.3em] uppercase text-[10px] max-w-lg mx-auto leading-relaxed">Every vision is a frequency waiting to be tuned.</p>
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        className="bg-white rounded-[32px] p-12 max-w-md w-full mx-4 text-center shadow-2xl"
+                    >
+                        <motion.div
+                            animate={{ rotate: [0, -10, 10, 0] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className="inline-block mb-6 text-zen-gold"
+                        >
+                            <Lock size={64} />
+                        </motion.div>
+                        <h2 className="heading-serif text-3xl text-charcoal mb-4">
+                            Vision Board Locked
+                        </h2>
+                        <p className="text-charcoal/60 text-base mb-8 leading-relaxed">
+                            Complete your Daily Gratitude Journal first to unlock your Vision Board and align with your dreams.
+                        </p>
+                        <button
+                            onClick={() => navigate('/gratitude')}
+                            className="w-full bg-gradient-to-r from-[#B8860B] to-[#D4A643] text-white py-4 rounded-xl font-semibold text-sm uppercase tracking-[0.3em] hover:shadow-xl transition-all hover:translate-y-[-2px]"
+                        >
+                            Complete Daily Gratitude 🙏
+                        </button>
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="w-full mt-4 bg-white border border-charcoal/10 text-charcoal/60 py-4 rounded-xl font-semibold text-sm uppercase tracking-[0.3em] hover:bg-charcoal/5 transition-all"
+                        >
+                            Return to Dashboard
+                        </button>
+                    </motion.div>
                 </motion.div>
+            )}
 
-                {/* Filters & Search Control */}
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="flex flex-col md:flex-row items-center justify-between gap-8 glass-card bg-white p-6 rounded-[2.5rem] border border-charcoal/5 shadow-xl max-w-5xl mx-auto"
-                >
-                    <div className="relative w-full md:w-[400px]">
-                        <Search className="absolute left-7 top-1/2 -translate-y-1/2 text-charcoal/20" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Seek specific manifestations..."
-                            className="w-full bg-charcoal/2 border border-charcoal/5 rounded-3xl py-5 pl-16 pr-8 text-sm text-charcoal focus:bg-white focus:border-zen-gold/30 outline-none transition-all placeholder:text-charcoal/20"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
+            {/* Main Content - Blurred if locked */}
+            <div className={gratitudeCompletedToday ? '' : 'blur-sm pointer-events-none'}>
+                <div className="max-w-7xl mx-auto mb-32 space-y-12 text-center">
+                    <motion.button
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        onClick={() => navigate('/dashboard')}
+                        className="group flex items-center gap-4 text-charcoal/30 hover:text-zen-gold transition-all mx-auto px-6 py-2 rounded-full border border-charcoal/5 bg-white shadow-sm"
+                    >
+                        <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                        <span className="text-[10px] uppercase tracking-[0.5em] font-black">Return to Sanctuary</span>
+                    </motion.button>
 
-                    <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto no-scrollbar">
-                        {['all', 'in-progress', 'achieved'].map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => setFilter(f)}
-                                className={`px-10 py-5 rounded-[20px] text-[9px] uppercase tracking-[0.4em] font-black transition-all whitespace-nowrap
-                                    ${filter === f
-                                        ? 'bg-zen-gold text-white shadow-lg shadow-gold-glow scale-105'
-                                        : 'bg-white text-charcoal/40 border border-charcoal/5 hover:border-zen-gold/30'}`}
-                            >
-                                {f.replace('-', ' ')}
-                            </button>
-                        ))}
-                    </div>
-                </motion.div>
-            </div>
+                    <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                    >
+                        <h1 className="heading-serif text-8xl text-charcoal mb-4 tracking-tight">The Vision <span className="text-zen-gold italic block mt-2">Gallery</span></h1>
+                        <p className="text-charcoal/40 font-light text-lg tracking-[0.3em] uppercase text-[10px] max-w-lg mx-auto leading-relaxed">Every vision is a frequency waiting to be tuned.</p>
+                    </motion.div>
+
+                    {/* Filters & Search Control */}
+                    <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex flex-col md:flex-row items-center justify-between gap-8 glass-card bg-white p-6 rounded-[2.5rem] border border-charcoal/5 shadow-xl max-w-5xl mx-auto"
+                    >
+                        <div className="relative w-full md:w-[400px]">
+                            <Search className="absolute left-7 top-1/2 -translate-y-1/2 text-charcoal/20" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Seek specific manifestations..."
+                                className="w-full bg-charcoal/2 border border-charcoal/5 rounded-3xl py-5 pl-16 pr-8 text-sm text-charcoal focus:bg-white focus:border-zen-gold/30 outline-none transition-all placeholder:text-charcoal/20"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto no-scrollbar">
+                            {['all', 'in-progress', 'achieved'].map((f) => (
+                                <button
+                                    key={f}
+                                    onClick={() => setFilter(f)}
+                                    className={`px-10 py-5 rounded-[20px] text-[9px] uppercase tracking-[0.4em] font-black transition-all whitespace-nowrap
+                                        ${filter === f
+                                            ? 'bg-zen-gold text-white shadow-lg shadow-gold-glow scale-105'
+                                            : 'bg-white text-charcoal/40 border border-charcoal/5 hover:border-zen-gold/30'}`}
+                                >
+                                    {f.replace('-', ' ')}
+                                </button>
+                            ))}
+                        </div>
+                    </motion.div>
+                </div>
 
             {/* Gallery Grid */}
             <div className="max-w-7xl mx-auto">
@@ -185,6 +233,7 @@ const VisionGallery = () => {
                     <span className="text-[9px] font-black uppercase tracking-[0.4em]">Vault Protection Enabled</span>
                 </div>
                 <p className="text-[9px] font-black uppercase tracking-[0.6em]">Sankalp AI — Archive 2026</p>
+            </div>
             </div>
         </div>
     );

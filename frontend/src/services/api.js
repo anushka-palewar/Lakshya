@@ -101,4 +101,11 @@ export const userService = {
     updateStreak: (payload) => api.post('/user/streak/update', payload),
 };
 
+export const gratitudeService = {
+    getTodayStatus: () => api.get('/gratitude/today'),
+    submitGratitude: (data) => api.post('/gratitude', data),
+    getHistory: () => api.get('/gratitude/history'),
+    hasCompletedToday: () => api.get('/gratitude/completed-today'),
+};
+
 export default api;

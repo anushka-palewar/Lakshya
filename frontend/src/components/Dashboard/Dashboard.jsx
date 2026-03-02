@@ -8,7 +8,7 @@ import Footer from '../Footer/Footer';
 import AddDreamModal from '../Modal/AddDreamModal';
 import '../../styles/Dashboard.css';
 import { useNavigate } from 'react-router-dom';
-import { userService, dreamService } from '../../services/api';
+import { userService, dreamService, gratitudeService } from '../../services/api';
 import { useToast } from '../Shared/ToastContext';
 
 export default function Dashboard() {
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [streakDays, setStreakDays] = useState(0);
   const [dreams, setDreams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [gratitudeCompletedToday, setGratitudeCompletedToday] = useState(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -23,9 +24,14 @@ export default function Dashboard() {
     (async () => {
       setLoading(true);
       try {
-        const [sRes, dRes] = await Promise.all([userService.getStreak(), dreamService.getDreams()]);
+        const [sRes, dRes, gRes] = await Promise.all([
+          userService.getStreak(), 
+          dreamService.getDreams(),
+          gratitudeService.getTodayStatus()
+        ]);
         setStreakDays(sRes.data?.currentStreak || 0);
         setDreams(dRes.data || []);
+        setGratitudeCompletedToday(gRes.data?.completed || false);
       } catch (err) {
         let msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to load dashboard data';
         if (typeof msg === 'object') msg = JSON.stringify(msg);
@@ -66,7 +72,10 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="dashboard-main">
         {/* Hero Section */}
-        <HeroSection onCtaClick={handleManifestationStart} />
+        <HeroSection 
+          onCtaClick={handleManifestationStart} 
+          gratitudeCompletedToday={gratitudeCompletedToday}
+        />
 
         {/* Dream Stream Section */}
         <DreamStream dreams={dreams} loading={loading} />

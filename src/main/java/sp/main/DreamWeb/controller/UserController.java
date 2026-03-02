@@ -14,6 +14,7 @@ import sp.main.DreamWeb.dto.StreakResponse;
 import sp.main.DreamWeb.model.User;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")

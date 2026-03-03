@@ -103,6 +103,7 @@ export const userService = {
     getProfile: () => api.get('/user/me'),
     getStreak: () => api.get('/user/streak'),
     updateStreak: (payload) => api.post('/user/streak/update', payload),
+    getAnalytics: () => api.get('/user/analytics'),
 };
 
 export const futureLetterService = {

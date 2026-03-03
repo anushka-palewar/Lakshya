@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sp.main.DreamWeb.dto.StreakResponse;
+import sp.main.DreamWeb.dto.LifeAnalyticsResponse;
+import sp.main.DreamWeb.service.LifeAnalyticsService;
 import sp.main.DreamWeb.model.User;
 
 import java.time.LocalDate;
@@ -23,6 +25,7 @@ public class UserController {
 
     private final sp.main.DreamWeb.service.StreakService streakService;
     private final sp.main.DreamWeb.repository.UserRepository userRepository;
+    private final LifeAnalyticsService lifeAnalyticsService;
 
     @GetMapping("/streak")
     public ResponseEntity<StreakResponse> getStreak(@AuthenticationPrincipal User user) {
@@ -53,9 +56,15 @@ public class UserController {
                 .build());
     }
 
-        @GetMapping("/me")
-        public ResponseEntity<?> getProfile(@AuthenticationPrincipal User user) {
-                if (user == null) return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
-                return ResponseEntity.ok(Map.of("username", user.getUsername(), "email", user.getEmail()));
-        }
+    @GetMapping("/me")
+    public ResponseEntity<?> getProfile(@AuthenticationPrincipal User user) {
+        if (user == null) return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+        return ResponseEntity.ok(Map.of("username", user.getUsername(), "email", user.getEmail()));
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<LifeAnalyticsResponse> getLifeAnalytics(@AuthenticationPrincipal User user) {
+        if (user == null) return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(lifeAnalyticsService.getAnalytics(user));
+    }
 }

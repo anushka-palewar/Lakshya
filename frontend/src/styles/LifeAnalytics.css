@@ -1,0 +1,387 @@
+/* Life Analytics Page Styles */
+
+.life-analytics-page {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.life-analytics-main {
+  flex: 1;
+  padding: var(--space-lg) 0;
+  margin-top: 60px;
+}
+
+.analytics-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+/* Header */
+.analytics-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.analytics-title {
+  font-family: var(--font-serif);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.analytics-subtitle {
+  font-size: 18px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Loading and Error States */
+.loading-text,
+.error-text {
+  text-align: center;
+  padding: var(--space-2xl);
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.error-text {
+  color: #ef4444;
+}
+
+/* Section Styles */
+.summary-section,
+.progress-section,
+.streak-history-section,
+.performance-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+/* SECTION A: Summary Cards */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.metric-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  box-shadow: 0 2px 8px rgba(31, 31, 31, 0.06);
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  box-shadow: 0 8px 20px rgba(31, 31, 31, 0.12);
+  transform: translateY(-2px);
+}
+
+.metric-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+}
+
+.metric-icon.total-dreams {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.metric-icon.completed-dreams {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.metric-icon.milestones {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.metric-icon.avg-time {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* SECTION B: Monthly Progress */
+.progress-container {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  box-shadow: 0 2px 8px rgba(31, 31, 31, 0.06);
+}
+
+.progress-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.progress-value {
+  font-size: 56px;
+  font-weight: 700;
+  color: #667eea;
+  min-width: 100px;
+}
+
+.progress-text {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.progress-bar-wrapper {
+  flex: 1;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 12px;
+  background: rgba(31, 31, 31, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 12px rgba(102, 126, 234, 0.4);
+}
+
+/* SECTION C: Streak History Graph */
+.streak-history-section {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  box-shadow: 0 2px 8px rgba(31, 31, 31, 0.06);
+}
+
+.streak-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.streak-stat-box {
+  text-align: center;
+  padding: var(--space-lg);
+  background: rgba(31, 31, 31, 0.03);
+  border-radius: var(--radius-sm);
+}
+
+.streak-stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.streak-stat-value {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.streak-stat-emoji {
+  font-size: 24px;
+  margin: var(--space-sm) 0 0 0;
+}
+
+.streak-graph-container {
+  background: rgba(31, 31, 31, 0.02);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+  overflow-x: auto;
+}
+
+.streak-graph {
+  display: flex;
+  justify-content: center;
+  min-width: fit-content;
+}
+
+.streak-svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.streak-line {
+  stroke: #667eea;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2));
+}
+
+.streak-point {
+  fill: #667eea;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.grid-line {
+  stroke: rgba(31, 31, 31, 0.08);
+  stroke-dasharray: 4, 4;
+}
+
+.axis-label {
+  font-size: 12px;
+  fill: var(--text-muted);
+}
+
+.no-data-text {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-lg);
+  margin: 0;
+}
+
+/* SECTION D: Performance Message */
+.performance-section {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.performance-message {
+  text-align: center;
+}
+
+.performance-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .analytics-title {
+    font-size: 36px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .metric-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .metric-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .progress-stats {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .progress-value {
+    font-size: 48px;
+  }
+
+  .section-title {
+    font-size: 22px;
+  }
+
+  .analytics-container {
+    padding: 0 var(--space-md);
+  }
+
+  .life-analytics-main {
+    padding: var(--space-md) 0;
+  }
+
+  .streak-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .performance-text {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-title {
+    font-size: 28px;
+  }
+
+  .metric-card {
+    padding: var(--space-md);
+  }
+
+  .metric-value {
+    font-size: 20px;
+  }
+
+  .progress-value {
+    font-size: 40px;
+    min-width: 80px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .streak-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-container {
+    padding: var(--space-lg);
+  }
+
+  .analytics-container {
+    padding: 0 var(--space-sm);
+  }
+}

@@ -73,6 +73,9 @@ export default function Navbar({ onAddDreamClick, streakDays = 7 }) {
                   <div className="profile-email">{profile.email || '—'}</div>
                 </div>
                 <div className="profile-actions">
+                  <button className="btn-ghost" onClick={() => navigate('/analytics')} title="Life Analytics">
+                    📊 Life Analytics
+                  </button>
                   <button className="btn-ghost" onClick={() => navigate('/future-letter')} title="Future Letter">
                     📜 Future Letter
                   </button>

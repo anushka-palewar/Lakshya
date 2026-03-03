@@ -9,6 +9,7 @@ import DreamFormPage from './components/Dreams/DreamFormPage';
 import DreamDetailPage from './components/Dreams/DreamDetailPage';
 import GratitudePage from './components/Gratitude/GratitudePage';
 import FutureLetterPage from './components/FutureLetter/FutureLetterPage';
+import LifeAnalyticsPage from './components/Analytics/LifeAnalyticsPage';
 import { authService } from './services/api';
 
 // Protected Route Component
@@ -105,6 +106,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <FutureLetterPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <LifeAnalyticsPage />
               </ProtectedRoute>
             }
           />

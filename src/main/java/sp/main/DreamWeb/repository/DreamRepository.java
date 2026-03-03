@@ -24,4 +24,10 @@ public interface DreamRepository extends JpaRepository<Dream, Long> {
             "LIMIT 1", nativeQuery = true)
     Optional<Dream> findDailyFocusDream(@Param("userId") Long userId,
             @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
+    
+    @Query("SELECT COUNT(d) FROM Dream d WHERE d.user.id = :userId")
+    long countByUserId(@Param("userId") Long userId);
+    
+    @Query("SELECT COUNT(d) FROM Dream d WHERE d.user.id = :userId AND d.isAchieved = true")
+    long countCompletedByUserId(@Param("userId") Long userId);
 }

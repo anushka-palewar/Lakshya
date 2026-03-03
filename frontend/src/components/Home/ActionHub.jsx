@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Lock, FileText } from 'lucide-react';
+import { Plus, Lock, FileText, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/ActionHub.css';
@@ -54,11 +54,29 @@ export default function ActionHub({ onAddDreamClick }) {
             <p className="action-card-subtitle">Write to your future self</p>
           </motion.div>
 
-          {/* Card 3: Vision Board (Locked) */}
+          {/* Card 3: Life Analytics */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="action-card"
+            onClick={() => navigate('/analytics')}
+          >
+            <div className="action-icon-wrapper">
+              <button className="btn-circle-large">
+                <BarChart3 size={40} />
+              </button>
+            </div>
+            <h3 className="action-card-title">Life Analytics</h3>
+            <p className="action-card-subtitle">View your progress dashboard</p>
+          </motion.div>
+
+          {/* Card 4: Vision Board (Locked) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
             className="action-card action-card-locked"
           >

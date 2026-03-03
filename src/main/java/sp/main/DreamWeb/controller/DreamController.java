@@ -8,6 +8,8 @@ import sp.main.DreamWeb.dto.DreamResponse;
 import sp.main.DreamWeb.service.DreamService;
 
 import java.util.List;
+import sp.main.DreamWeb.dto.MilestoneSuggestionRequest;
+import sp.main.DreamWeb.service.MilestoneService;
 
 @RestController
 @RequestMapping("/api/dreams")
@@ -15,6 +17,7 @@ import java.util.List;
 public class DreamController {
 
     private final DreamService service;
+    private final MilestoneService milestoneService;
 
     @PostMapping
     public ResponseEntity<DreamResponse> saveDream(@RequestBody DreamRequest request) {
@@ -48,4 +51,13 @@ public class DreamController {
         DreamResponse dailyFocus = service.getDailyFocusDream();
         return dailyFocus != null ? ResponseEntity.ok(dailyFocus) : ResponseEntity.noContent().build();
     }
+
+       @PostMapping("/suggest-milestones")
+       public ResponseEntity<List<String>> suggestMilestones(@RequestBody MilestoneSuggestionRequest request) {
+           List<String> suggestions = milestoneService.generateMilestoneSuggestions(
+               request.getDreamTitle(),
+               request.getDreamDescription()
+           );
+           return ResponseEntity.ok(suggestions);
+       }
 }

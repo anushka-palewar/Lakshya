@@ -10,6 +10,7 @@ import '../../styles/Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import { userService, dreamService, gratitudeService } from '../../services/api';
 import { useToast } from '../Shared/ToastContext';
+import { Plus } from 'lucide-react';
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,6 +69,31 @@ export default function Dashboard() {
     <div className="dashboard">
       {/* Navbar */}
     <Navbar onAddDreamClick={handleAddDreamClick} streakDays={streakDays} />
+
+      {/* Quick Add Button */}
+      <button
+        onClick={() => navigate('/dreams/new')}
+        title="Create new dream"
+        style={{
+          position: 'fixed',
+          right: 20,
+          bottom: 20,
+          zIndex: 1200,
+          backgroundColor: '#4f46e5',
+          color: 'white',
+          border: 'none',
+          padding: '12px 16px',
+          borderRadius: '12px',
+          boxShadow: '0 6px 18px rgba(79,70,229,0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          cursor: 'pointer'
+        }}
+      >
+        <Plus size={16} />
+        New Dream
+      </button>
 
       {/* Main Content */}
       <main className="dashboard-main">

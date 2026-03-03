@@ -93,6 +93,10 @@ export const dreamService = {
     deleteDream: (id) => api.delete(`/dreams/${id}`),
     getDailySelection: () => api.get('/dreams/daily'),
     getDailyFocusDream: () => api.get('/dreams/daily-focus'),
+    suggestMilestones: (dreamTitle, dreamDescription) => api.post('/dreams/suggest-milestones', {
+         dreamTitle,
+         dreamDescription
+    }),
 };
 
 export const userService = {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import FocusMode from './FocusMode';
 import { dreamService } from '../../services/api';
 import { useToast } from '../Shared/ToastContext';
 import '../../styles/DreamStream.css';
@@ -7,6 +8,7 @@ import '../../styles/DreamStream.css';
 export default function DreamsListPage() {
   const [dreams, setDreams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [focusDream, setFocusDream] = useState(null);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -60,8 +62,8 @@ export default function DreamsListPage() {
         ) : (
           <div className="dream-cards-grid">
             {dreams.map((d) => (
-              <div key={d.id} className="dream-card">
-                <div className="dream-card-image" style={{ backgroundImage: `url(${d.imageUrl || ''})` }}>
+              <div key={d.id} className="dream-card" style={{ cursor: 'default' }}>
+                <div className="dream-card-image" style={{ backgroundImage: `url(${d.imageUrl || ''})`, cursor: 'pointer' }} onClick={() => navigate(`/dreams/${d.id}`)}>
                   <div className="dream-card-overlay"></div>
                   <div className="dream-card-content">
                     <h3 className="dream-card-title" style={{ textDecoration: d.isAchieved ? 'line-through' : 'none', opacity: d.isAchieved ? 0.7 : 1 }}>
@@ -74,8 +76,9 @@ export default function DreamsListPage() {
                       <span>Progress: {d.progress || 0}%</span>
                     </div>
                     <div className="dream-card-actions">
-                      <button onClick={() => navigate(`/dreams/${d.id}/edit`)}>Edit</button>
-                      <button onClick={() => handleDelete(d.id)}>Delete</button>
+                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dreams/${d.id}/edit`); }}>Edit</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleDelete(d.id); }}>Delete</button>
+                      <button onClick={(e) => { e.stopPropagation(); setFocusDream(d); }}>Focus</button>
                     </div>
                   </div>
                 </div>
@@ -84,6 +87,9 @@ export default function DreamsListPage() {
           </div>
         )}
       </div>
+      {focusDream && (
+        <FocusMode dream={focusDream} onClose={() => setFocusDream(null)} />
+      )}
     </section>
   );
 }

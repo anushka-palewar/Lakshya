@@ -40,6 +40,11 @@ public class DreamController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DreamResponse> getDreamById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getDreamById(id));
+    }
+
     @GetMapping("/daily")
     public ResponseEntity<DreamResponse> getDailySelection() {
         DreamResponse daily = service.getDailySelection();

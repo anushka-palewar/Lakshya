@@ -8,6 +8,7 @@ import sp.main.DreamWeb.dto.DreamResponse;
 import sp.main.DreamWeb.model.Dream;
 import sp.main.DreamWeb.model.User;
 import sp.main.DreamWeb.repository.DreamRepository;
+import sp.main.DreamWeb.repository.MilestoneRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class DreamService {
 
     private final DreamRepository repository;
+    private final MilestoneRepository milestoneRepository;
 
     private User getCurrentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -73,6 +75,18 @@ public class DreamService {
         dream.setAchieved(request.isAchieved());
 
         return mapToResponse(repository.save(dream));
+    }
+
+    public DreamResponse getDreamById(Long id) {
+        User user = getCurrentUser();
+        Dream dream = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Dream not found"));
+
+        if (!dream.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Action not authorized");
+        }
+
+        return mapToResponse(dream);
     }
 
     public void deleteDream(Long id) {
@@ -136,6 +150,12 @@ public class DreamService {
                 .progress(progress)
                 .createdAt(dream.getCreatedAt())
                 .lastFocusedAt(dream.getLastFocusedAt())
+                .milestones(
+                    milestoneRepository.findAllByDreamIdOrderByCreatedAtAsc(dream.getId())
+                        .stream()
+                        .map(m -> m.getTitle())
+                        .toList()
+                )
                 .build();
     }
 }

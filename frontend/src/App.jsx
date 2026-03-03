@@ -6,6 +6,7 @@ import VisionGallery from './components/Gallery/VisionGallery';
 import ManifestationPage from './components/Manifestation/ManifestationPage';
 import DreamsListPage from './components/Dreams/DreamsListPage';
 import DreamFormPage from './components/Dreams/DreamFormPage';
+import DreamDetailPage from './components/Dreams/DreamDetailPage';
 import GratitudePage from './components/Gratitude/GratitudePage';
 import { authService } from './services/api';
 
@@ -76,6 +77,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <DreamFormPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dreams/:id"
+            element={
+              <ProtectedRoute>
+                <DreamDetailPage />
               </ProtectedRoute>
             }
           />

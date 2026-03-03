@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { dreamService } from '../../services/api';
 import { useToast } from '../Shared/ToastContext';
 import { Sparkles, X, CheckCircle2 } from 'lucide-react';
+import FocusMode from './FocusMode';
 
 export default function DreamFormPage() {
   const { id } = useParams();
@@ -71,6 +72,8 @@ export default function DreamFormPage() {
   const removeMilestone = (index) => {
     setMilestones(prev => prev.filter((_, i) => i !== index));
   };
+
+  const [focusOpen, setFocusOpen] = useState(false);
 
   useEffect(() => {
     if (isEdit) {
@@ -205,6 +208,18 @@ export default function DreamFormPage() {
             <label className="form-label">Target Date</label>
             <input type="date" name="dueDate" value={formData.dueDate} onChange={handleChange} className="form-input" />
           </div>
+          {isEdit && (
+            <div className="form-group">
+              <button
+                type="button"
+                onClick={() => setFocusOpen(true)}
+                className="btn-primary"
+                style={{ marginTop: 8 }}
+              >
+                Enter Focus Mode
+              </button>
+            </div>
+          )}
           <div className="form-group">
             <label className="form-label">
               <input
@@ -323,6 +338,14 @@ export default function DreamFormPage() {
               </div>
             </div>
           </>
+        )}
+        {focusOpen && (
+          <FocusMode dream={{
+            id: id,
+            name: formData.name,
+            imageUrl: formData.imageUrl,
+            description: formData.description
+          }} onClose={() => setFocusOpen(false)} />
         )}
     </section>
   );

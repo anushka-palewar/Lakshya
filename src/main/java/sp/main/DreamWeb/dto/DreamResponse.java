@@ -22,4 +22,5 @@ public class DreamResponse {
     private int progress; // computed percentage
     private LocalDateTime createdAt;
     private LocalDateTime lastFocusedAt;
+    private java.util.List<String> milestones;
 }

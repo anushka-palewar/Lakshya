@@ -9,6 +9,9 @@ import sp.main.DreamWeb.model.Dream;
 import sp.main.DreamWeb.model.User;
 import sp.main.DreamWeb.repository.DreamRepository;
 import sp.main.DreamWeb.repository.MilestoneRepository;
+import sp.main.DreamWeb.repository.ManifestationRepository;
+import sp.main.DreamWeb.repository.GratitudeRepository;
+import sp.main.DreamWeb.util.DreamEnergyScoreCalculator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +25,8 @@ public class DreamService {
 
     private final DreamRepository repository;
     private final MilestoneRepository milestoneRepository;
+    private final ManifestationRepository manifestationRepository;
+    private final GratitudeRepository gratitudeRepository;
 
     private User getCurrentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -139,6 +144,23 @@ public class DreamService {
                 progress = (int) Math.min(100, Math.max(0, (passed * 100) / total));
             }
         }
+
+        // Calculate Dream Energy Score dynamically
+        int milestonesCompleted = (int) milestoneRepository.findAllByDreamIdOrderByCreatedAtAsc(dream.getId())
+                .stream()
+                .filter(m -> m.isCompleted())
+                .count();
+        long daysTracked = DreamEnergyScoreCalculator.daysSince(dream.getCreatedAt().toLocalDate());
+        long gratitudeCount = gratitudeRepository.countByUserId(dream.getUser().getId());
+        long visualizationSessions = manifestationRepository.countByFocusedDreamId(dream.getId());
+
+        int energyScore = DreamEnergyScoreCalculator.calculateEnergyScore(
+                milestonesCompleted,
+                daysTracked,
+                gratitudeCount,
+                visualizationSessions
+        );
+
         return DreamResponse.builder()
                 .id(dream.getId())
                 .name(dream.getName())
@@ -156,6 +178,7 @@ public class DreamService {
                         .map(m -> m.getTitle())
                         .toList()
                 )
+                .energyScore(energyScore)
                 .build();
     }
 }

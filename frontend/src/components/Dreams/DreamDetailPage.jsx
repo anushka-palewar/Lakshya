@@ -12,12 +12,23 @@ export default function DreamDetailPage() {
   const [dream, setDream] = useState(null);
   const [loading, setLoading] = useState(true);
   const [focusOpen, setFocusOpen] = useState(false);
+  const [prevEnergyScore, setPrevEnergyScore] = useState(0);
+  const [animatingScore, setAnimatingScore] = useState(false);
 
   const load = async () => {
     setLoading(true);
     try {
       const res = await dreamService.getDream(id);
-      setDream(res.data);
+      const newDream = res.data;
+      
+      // Trigger animation if score increased
+      if (newDream.energyScore > prevEnergyScore) {
+        setAnimatingScore(true);
+        setTimeout(() => setAnimatingScore(false), 600);
+      }
+      
+      setPrevEnergyScore(newDream.energyScore || 0);
+      setDream(newDream);
     } catch (err) {
       let msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to load dream';
       if (typeof msg === 'object') msg = JSON.stringify(msg);
@@ -103,6 +114,57 @@ export default function DreamDetailPage() {
               ) : (
                 <p style={{ color: '#888' }}>No milestones yet.</p>
               )}
+            </div>
+
+            <div style={{ marginTop: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <h3 style={{ margin: 0 }}>Dream Energy</h3>
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: 'bold',
+                  color: '#4f46e5'
+                }}>
+                  {dream.energyScore || 0}/100
+                </span>
+              </div>
+              <style>{`
+                @keyframes scoreGlow { 
+                  0%, 100% { box-shadow: 0 0 8px rgba(79, 70, 229, 0.4); }
+                  50% { box-shadow: 0 0 16px rgba(79, 70, 229, 0.8); }
+                }
+                @keyframes scoreProgress {
+                  0% { width: 0%; }
+                  100% { width: ${dream.energyScore || 0}%; }
+                }
+                .energy-bar-glow {
+                  animation: ${animatingScore ? 'scoreGlow 600ms ease-in-out' : 'none'};
+                }
+              `}</style>
+              <div 
+                style={{ 
+                  width: '100%', 
+                  height: 24, 
+                  backgroundColor: '#f0f0f0', 
+                  borderRadius: 12, 
+                  overflow: 'hidden',
+                  border: '1px solid #e0e0e0'
+                }}
+                className="energy-bar-glow"
+              >
+                <div 
+                  style={{ 
+                    height: '100%', 
+                    width: `${dream.energyScore || 0}%`, 
+                    backgroundColor: '#4f46e5',
+                    borderRadius: 12,
+                    transition: 'width 600ms ease-out',
+                    boxShadow: animatingScore ? '0 0 12px rgba(79, 70, 229, 0.8)' : 'none'
+                  }}
+                />
+              </div>
+              <p style={{ marginTop: 8, fontSize: '12px', color: '#888' }}>
+                Based on completed milestones, days tracked, gratitude entries, and focus sessions.
+              </p>
             </div>
           </div>
         </div>

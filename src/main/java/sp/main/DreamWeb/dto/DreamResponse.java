@@ -23,4 +23,5 @@ public class DreamResponse {
     private LocalDateTime createdAt;
     private LocalDateTime lastFocusedAt;
     private java.util.List<String> milestones;
+    private int energyScore; // 0-100
 }

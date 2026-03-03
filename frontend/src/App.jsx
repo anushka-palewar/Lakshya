@@ -8,6 +8,7 @@ import DreamsListPage from './components/Dreams/DreamsListPage';
 import DreamFormPage from './components/Dreams/DreamFormPage';
 import DreamDetailPage from './components/Dreams/DreamDetailPage';
 import GratitudePage from './components/Gratitude/GratitudePage';
+import FutureLetterPage from './components/FutureLetter/FutureLetterPage';
 import { authService } from './services/api';
 
 // Protected Route Component
@@ -95,6 +96,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <GratitudePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/future-letter"
+            element={
+              <ProtectedRoute>
+                <FutureLetterPage />
               </ProtectedRoute>
             }
           />

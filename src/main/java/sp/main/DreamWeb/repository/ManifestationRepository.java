@@ -13,4 +13,6 @@ public interface ManifestationRepository extends JpaRepository<Manifestation, Lo
     List<Manifestation> findAllByUserId(Long userId);
 
     Optional<Manifestation> findByUserIdAndDate(Long userId, LocalDate date);
+
+    long countByFocusedDreamId(Long dreamId);
 }

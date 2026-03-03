@@ -22,4 +22,6 @@ public interface GratitudeRepository extends JpaRepository<DailyGratitude, Long>
            "FROM DailyGratitude dg " +
            "WHERE dg.user.id = :userId AND dg.entryDate = CURRENT_DATE")
     boolean existsByUserIdAndToday(@Param("userId") Long userId);
+
+    long countByUserId(Long userId);
 }

@@ -105,6 +105,12 @@ export const userService = {
     updateStreak: (payload) => api.post('/user/streak/update', payload),
 };
 
+export const futureLetterService = {
+    getLetter: () => api.get('/future-letter'),
+    saveLetter: (content) => api.post('/future-letter', { content }),
+    updateLetter: (content) => api.put('/future-letter', { content }),
+};
+
 export const gratitudeService = {
     getTodayStatus: () => api.get('/gratitude/today'),
     submitGratitude: (data) => api.post('/gratitude', data),

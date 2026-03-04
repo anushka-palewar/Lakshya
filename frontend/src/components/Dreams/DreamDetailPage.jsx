@@ -54,6 +54,26 @@ export default function DreamDetailPage() {
     }
   };
 
+  const handleMilestoneToggle = async (milestoneId, isCompleted) => {
+    try {
+      const milestone = dream.milestones.find(m => m.id === milestoneId);
+      if (milestone) {
+        await dreamService.updateMilestone(id, milestoneId, {
+          title: milestone.title,
+          description: milestone.description,
+          dueDate: milestone.dueDate,
+          difficultyLevel: milestone.difficultyLevel,
+          isCompleted: isCompleted
+        });
+        // reload dream to see updated progress
+        await load();
+        addToast(isCompleted ? 'Milestone completed!' : 'Milestone unmarked', 'success');
+      }
+    } catch (err) {
+      addToast('Failed to update milestone', 'error');
+    }
+  };
+
   if (loading) return <div style={{ padding: 24 }}>Loading...</div>;
   if (!dream) return <div style={{ padding: 24 }}>Dream not found.</div>;
 
@@ -106,11 +126,62 @@ export default function DreamDetailPage() {
             <div style={{ marginTop: 20 }}>
               <h3>Milestones</h3>
               {dream.milestones && dream.milestones.length > 0 ? (
-                <ul>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {dream.milestones.map((m, i) => (
-                    <li key={i}>{m}</li>
+                    <div 
+                      key={i} 
+                      style={{
+                        padding: '12px',
+                        backgroundColor: '#f8f8f8',
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '12px',
+                        borderLeft: m.isCompleted ? '4px solid #4caf50' : '4px solid #ccc'
+                      }}
+                    >
+                      <input 
+                        type="checkbox" 
+                        checked={m.isCompleted} 
+                        onChange={(e) => handleMilestoneToggle(m.id, e.target.checked)}
+                        style={{ marginTop: '4px', cursor: 'pointer' }}
+                      />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, textDecoration: m.isCompleted ? 'line-through' : 'none' }}>
+                          {m.title}
+                        </div>
+                        {m.description && <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>{m.description}</div>}
+                        <div style={{ fontSize: '12px', color: '#999', marginTop: '6px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                          {m.difficultyLevel && (
+                            <span style={{ 
+                              backgroundColor: m.difficultyLevel === 'HARD' ? '#fdd' : m.difficultyLevel === 'MEDIUM' ? '#ffd' : '#dfd',
+                              padding: '3px 8px',
+                              borderRadius: '3px'
+                            }}>
+                              {m.difficultyLevel}
+                            </span>
+                          )}
+                          {m.riskStatus && (
+                            <span style={{ 
+                              backgroundColor: m.riskStatus === 'Overdue' ? '#fdd' : m.riskStatus === 'At Risk' ? '#ffd' : '#dfd',
+                              padding: '3px 8px',
+                              borderRadius: '3px'
+                            }}>
+                              {m.riskStatus}
+                            </span>
+                          )}
+                          {m.urgencyScore > 0 && (
+                            <span title="Urgency">⚡ {m.urgencyScore}/100</span>
+                          )}
+                          {m.stalled && <span style={{ color: '#f44' }}>⏸️ Stalled</span>}
+                          {m.predictedCompletionDate && (
+                            <span>Est. {new Date(m.predictedCompletionDate).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               ) : (
                 <p style={{ color: '#888' }}>No milestones yet.</p>
               )}

@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sp.main.DreamWeb.dto.DreamRequest;
 import sp.main.DreamWeb.dto.DreamResponse;
+import sp.main.DreamWeb.dto.MilestoneRequest;
+import sp.main.DreamWeb.dto.MilestoneResponse;
 import sp.main.DreamWeb.service.DreamService;
 
 import java.util.List;
@@ -64,5 +66,42 @@ public class DreamController {
                request.getDreamDescription()
            );
            return ResponseEntity.ok(suggestions);
+       }
+
+       // ===== MILESTONE ENDPOINTS =====
+
+       @PostMapping("/{dreamId}/milestones")
+       public ResponseEntity<MilestoneResponse> createMilestone(
+               @PathVariable Long dreamId,
+               @RequestBody MilestoneRequest request) {
+           return ResponseEntity.ok(service.saveMilestone(dreamId, request));
+       }
+
+       @GetMapping("/{dreamId}/milestones")
+       public ResponseEntity<List<MilestoneResponse>> getMilestones(@PathVariable Long dreamId) {
+           return ResponseEntity.ok(service.getMilestones(dreamId));
+       }
+
+       @GetMapping("/{dreamId}/milestones/{milestoneId}")
+       public ResponseEntity<MilestoneResponse> getMilestone(
+               @PathVariable Long dreamId,
+               @PathVariable Long milestoneId) {
+           return ResponseEntity.ok(service.getMilestone(dreamId, milestoneId));
+       }
+
+       @PutMapping("/{dreamId}/milestones/{milestoneId}")
+       public ResponseEntity<MilestoneResponse> updateMilestone(
+               @PathVariable Long dreamId,
+               @PathVariable Long milestoneId,
+               @RequestBody MilestoneRequest request) {
+           return ResponseEntity.ok(service.updateMilestone(dreamId, milestoneId, request));
+       }
+
+       @DeleteMapping("/{dreamId}/milestones/{milestoneId}")
+       public ResponseEntity<Void> deleteMilestone(
+               @PathVariable Long dreamId,
+               @PathVariable Long milestoneId) {
+           service.deleteMilestone(dreamId, milestoneId);
+           return ResponseEntity.noContent().build();
        }
 }

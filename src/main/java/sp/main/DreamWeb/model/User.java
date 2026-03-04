@@ -33,9 +33,11 @@ public class User implements UserDetails {
     private String password;
 
     @Column(columnDefinition = "INTEGER DEFAULT 0")
+    @Builder.Default
     private int currentStreak = 0;
 
     @Column(columnDefinition = "INTEGER DEFAULT 0")
+    @Builder.Default
     private int longestStreak = 0;
 
     private LocalDateTime lastLoginDate;

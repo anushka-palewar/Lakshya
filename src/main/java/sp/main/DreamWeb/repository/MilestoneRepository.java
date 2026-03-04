@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface MilestoneRepository extends JpaRepository<Milestone, Long> {
     List<Milestone> findAllByDreamIdOrderByCreatedAtAsc(Long dreamId);
+    List<Milestone> findAllByDreamIdOrderByDueDateAsc(Long dreamId);
     
     @Query("SELECT COUNT(m) FROM Milestone m WHERE m.dream.user.id = :userId AND m.isCompleted = true")
     long countCompletedByUserId(@Param("userId") Long userId);

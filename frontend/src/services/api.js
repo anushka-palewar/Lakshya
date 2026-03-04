@@ -97,6 +97,12 @@ export const dreamService = {
          dreamTitle,
          dreamDescription
     }),
+    // Milestone CRUD
+    getMilestones: (dreamId) => api.get(`/dreams/${dreamId}/milestones`),
+    getMilestone: (dreamId, milestoneId) => api.get(`/dreams/${dreamId}/milestones/${milestoneId}`),
+    createMilestone: (dreamId, milestone) => api.post(`/dreams/${dreamId}/milestones`, milestone),
+    updateMilestone: (dreamId, milestoneId, milestone) => api.put(`/dreams/${dreamId}/milestones/${milestoneId}`, milestone),
+    deleteMilestone: (dreamId, milestoneId) => api.delete(`/dreams/${dreamId}/milestones/${milestoneId}`),
 };
 
 export const userService = {

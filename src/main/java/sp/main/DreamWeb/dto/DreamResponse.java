@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -22,6 +23,6 @@ public class DreamResponse {
     private int progress; // computed percentage
     private LocalDateTime createdAt;
     private LocalDateTime lastFocusedAt;
-    private java.util.List<String> milestones;
+    private java.util.List<MilestoneResponse> milestones;
     private int energyScore; // 0-100
 }

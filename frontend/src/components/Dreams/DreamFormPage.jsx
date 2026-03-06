@@ -26,6 +26,12 @@ export default function DreamFormPage() {
     const [suggestLoading, setSuggestLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedSuggestions, setSelectedSuggestions] = useState(new Set());
+  const [imageSearchResults, setImageSearchResults] = useState([]);
+  const [imageSearchLoading, setImageSearchLoading] = useState(false);
+  const [imageGenerateLoading, setImageGenerateLoading] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState('');
+  const [manualSearch, setManualSearch] = useState('');
+  const manualTimer = React.useRef(null);
   const handleGenerateMilestones = async () => {
     if (!formData.name.trim()) {
       addToast('Please enter a dream name first', 'error');
@@ -71,6 +77,64 @@ export default function DreamFormPage() {
 
   const removeMilestone = (index) => {
     setMilestones(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleImageSearch = async (customQuery) => {
+    if (!customQuery && !formData.name.trim() && !formData.description.trim()) {
+      addToast('Please enter a dream name or description first', 'error');
+      return;
+    }
+    setImageSearchLoading(true);
+    setImageSearchResults([]);
+    try {
+      const title = formData.name;
+      const description = formData.description;
+      const category = formData.category;
+      const res = await dreamService.searchImages(title, description, category, customQuery || null);
+      const data = res.data || [];
+      setImageSearchResults(data);
+      if (data.length === 0) {
+        addToast('No images found. Try refining your search keywords.', 'warning');
+      }
+    } catch (err) {
+      let msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to search images';
+      if (typeof msg === 'object') msg = JSON.stringify(msg);
+      addToast(msg, 'error');
+    } finally {
+      setImageSearchLoading(false);
+    }
+  };
+
+  const handleImageGenerate = async () => {
+    if (!formData.name.trim() && !formData.description.trim()) {
+      addToast('Please enter a dream name or description first', 'error');
+      return;
+    }
+    setImageGenerateLoading(true);
+    try {
+      const res = await dreamService.generateImage(formData.name, formData.description);
+      const generatedUrl = res.data?.imageUrl;
+      if (generatedUrl) {
+        setSelectedImageUrl(generatedUrl);
+        setFormData(prev => ({ ...prev, imageUrl: generatedUrl }));
+        addToast('AI image generated successfully!', 'success');
+      } else {
+        addToast('Failed to generate image', 'error');
+      }
+    } catch (err) {
+      let msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to generate image';
+      if (typeof msg === 'object') msg = JSON.stringify(msg);
+      addToast(msg, 'error');
+    } finally {
+      setImageGenerateLoading(false);
+    }
+  };
+
+  const handleImageSelect = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setFormData(prev => ({ ...prev, imageUrl }));
+    setImageSearchResults([]);
+    addToast('Image selected!', 'success');
   };
 
   const [focusOpen, setFocusOpen] = useState(false);
@@ -145,12 +209,172 @@ export default function DreamFormPage() {
             <input name="name" value={formData.name} onChange={handleChange} required className="form-input" />
           </div>
           <div className="form-group">
-            <label className="form-label">Image URL</label>
-            <input name="imageUrl" value={formData.imageUrl} onChange={handleChange} className="form-input" />
-          </div>
-          <div className="form-group">
             <label className="form-label">Description</label>
             <textarea name="description" value={formData.description} onChange={handleChange} className="form-textarea" rows={4} />
+          </div>
+
+          {/* Dream Image Section */}
+          <div className="form-group">
+            <label className="form-label">Dream Image</label>
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  value={manualSearch}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setManualSearch(val);
+                    if (manualTimer.current) clearTimeout(manualTimer.current);
+                    manualTimer.current = setTimeout(() => {
+                      if (val.trim()) {
+                        handleImageSearch(val.trim());
+                      }
+                    }, 500);
+                  }}
+                  placeholder="Search for Dream Image"
+                  className="form-input"
+                  style={{ fontSize: '14px' }}
+                />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleImageSearch(null)}
+                    disabled={imageSearchLoading || imageGenerateLoading}
+                    className="btn-secondary"
+                    style={{
+                      opacity: imageSearchLoading || imageGenerateLoading ? 0.6 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {imageSearchLoading ? (
+                      <>
+                        <div style={{ width: '16px', height: '16px', border: '2px solid #666', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        ✨ Search Dream Images
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleImageGenerate}
+                    disabled={imageSearchLoading || imageGenerateLoading}
+                    className="btn-secondary"
+                    style={{
+                      opacity: imageSearchLoading || imageGenerateLoading ? 0.6 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {imageGenerateLoading ? (
+                      <>
+                        <div style={{ width: '16px', height: '16px', border: '2px solid #666', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        🎨 Generate Dream Image
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Manual URL input */}
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '14px', marginBottom: '4px', color: '#666' }}>
+                  Or paste image URL manually:
+                </label>
+                <input
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleChange}
+                  placeholder="https://example.com/image.jpg"
+                  className="form-input"
+                  style={{ fontSize: '14px' }}
+                />
+              </div>
+
+              {/* Image Preview */}
+              {(formData.imageUrl || selectedImageUrl) && (
+                <div style={{ marginTop: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: '#666' }}>
+                    Preview:
+                  </label>
+                  <div
+                    style={{
+                      width: '200px',
+                      height: '120px',
+                      backgroundImage: `url(${formData.imageUrl || selectedImageUrl})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      borderRadius: '8px',
+                      border: '2px solid #e0e0e0'
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Search Results */}
+              {imageSearchResults.length > 0 && (
+                <div style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: '#666' }}>
+                    Select an image:
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px' }}>
+                    {imageSearchResults.slice(0,6).map((url, index) => (
+                      <div key={index} style={{ position: 'relative', borderRadius: '6px', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
+                        <img
+                          src={url}
+                          alt={`Result ${index + 1}`}
+                          style={{ width: '120px', height: '80px', objectFit: 'cover' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleImageSelect(url)}
+                          style={{
+                            position: 'absolute',
+                            bottom: '4px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            padding: '4px 8px',
+                            fontSize: '11px',
+                            backgroundColor: '#4CAF50',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            opacity: 0.9
+                          }}
+                        >
+                          Select
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setImageSearchResults([])}
+                    style={{
+                      marginTop: '8px',
+                      padding: '6px 12px',
+                      backgroundColor: '#f0f0f0',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    Clear results
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
             <div className="form-group">
               <label className="form-label">Milestones</label>

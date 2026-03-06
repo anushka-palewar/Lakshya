@@ -20,3 +20,13 @@ spring:
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970 # 256-bit secret
   expiration: 86400000 # 24 hours in milliseconds
+
+# API Keys for image services
+unsplash:
+  access:
+    key:  ${QUbmtX8HAtZxO1clJ7EcoPW7oBqjNyz1rPD-dODrRxc}
+
+openai:
+  api:
+    key:  ${OPENAI_API_KEY}
+

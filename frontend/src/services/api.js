@@ -97,6 +97,16 @@ export const dreamService = {
          dreamTitle,
          dreamDescription
     }),
+    searchImages: (title, description, category, customQuery) => api.post('/dreams/search-images', {
+        title,
+        description,
+        category,
+        customQuery
+    }),
+    generateImage: (title, description) => api.post('/dreams/generate-image', {
+        title,
+        description
+    }),
     // Milestone CRUD
     getMilestones: (dreamId) => api.get(`/dreams/${dreamId}/milestones`),
     getMilestone: (dreamId, milestoneId) => api.get(`/dreams/${dreamId}/milestones/${milestoneId}`),

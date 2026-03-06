@@ -16,12 +16,74 @@ export default function AddDreamModal({ isOpen, onClose, onAdded }) {
     isAchieved: false,
   });
 
+  const [imageSearchResults, setImageSearchResults] = useState([]);
+  const [imageSearchLoading, setImageSearchLoading] = useState(false);
+  const [imageGenerateLoading, setImageGenerateLoading] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState('');
+  const [manualSearch, setManualSearch] = useState('');
+  const manualTimer = React.useRef(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const { addToast } = useToast();
+
+  const handleImageSearch = async (customQuery) => {
+    if (!customQuery && !formData.name.trim() && !formData.description.trim()) {
+      addToast('Please enter a dream name or description first', 'error');
+      return;
+    }
+    setImageSearchLoading(true);
+    setImageSearchResults([]);
+    try {
+      const res = await dreamService.searchImages(formData.name, formData.description, formData.category, customQuery || null);
+      const data = res.data || [];
+      setImageSearchResults(data);
+      if (data.length === 0) {
+        addToast('No images found. Try refining your search keywords.', 'warning');
+      }
+    } catch (err) {
+      let msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to search images';
+      if (typeof msg === 'object') msg = JSON.stringify(msg);
+      addToast(msg, 'error');
+    } finally {
+      setImageSearchLoading(false);
+    }
+  };
+
+  const handleImageGenerate = async () => {
+    if (!formData.name.trim() && !formData.description.trim()) {
+      addToast('Please enter a dream name or description first', 'error');
+      return;
+    }
+    setImageGenerateLoading(true);
+    try {
+      const res = await dreamService.generateImage(formData.name, formData.description);
+      const generatedUrl = res.data?.imageUrl;
+      if (generatedUrl) {
+        setSelectedImageUrl(generatedUrl);
+        setFormData(prev => ({ ...prev, imageUrl: generatedUrl }));
+        addToast('AI image generated successfully!', 'success');
+      } else {
+        addToast('Failed to generate image', 'error');
+      }
+    } catch (err) {
+      let msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to generate image';
+      if (typeof msg === 'object') msg = JSON.stringify(msg);
+      addToast(msg, 'error');
+    } finally {
+      setImageGenerateLoading(false);
+    }
+  };
+
+  const handleImageSelect = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setFormData(prev => ({ ...prev, imageUrl }));
+    setImageSearchResults([]);
+    addToast('Image selected!', 'success');
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -107,14 +169,160 @@ export default function AddDreamModal({ isOpen, onClose, onAdded }) {
               {/* Image URL */}
               <div className="form-group">
                 <label className="form-label">Image URL</label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="form-input"
-                />
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                    <input
+                      type="text"
+                      value={manualSearch}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setManualSearch(val);
+                        if (manualTimer.current) clearTimeout(manualTimer.current);
+                        manualTimer.current = setTimeout(() => {
+                          if (val.trim()) {
+                            handleImageSearch(val.trim());
+                          }
+                        }, 500);
+                      }}
+                      placeholder="Search for Dream Image"
+                      className="form-input"
+                      style={{ fontSize: '14px' }}
+                    />
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleImageSearch(null)}
+                        disabled={imageSearchLoading || imageGenerateLoading}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: imageSearchLoading || imageGenerateLoading ? '#ccc' : '#4CAF50',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: imageSearchLoading || imageGenerateLoading ? 'not-allowed' : 'pointer',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        {imageSearchLoading ? (
+                          <>
+                            <div style={{ width: '12px', height: '12px', border: '2px solid #666', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                            Searching...
+                          </>
+                        ) : (
+                          <>
+                            ✨ Search
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleImageGenerate}
+                        disabled={imageSearchLoading || imageGenerateLoading}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: imageSearchLoading || imageGenerateLoading ? '#ccc' : '#2196F3',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: imageSearchLoading || imageGenerateLoading ? 'not-allowed' : 'pointer',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        {imageGenerateLoading ? (
+                          <>
+                            <div style={{ width: '12px', height: '12px', border: '2px solid #666', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            🎨 Generate
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <input
+                    type="url"
+                    name="imageUrl"
+                    value={formData.imageUrl}
+                    onChange={handleChange}
+                    placeholder="https://example.com/image.jpg or select from above"
+                    className="form-input"
+                    style={{ fontSize: '14px' }}
+                  />
+                  {(formData.imageUrl || selectedImageUrl) && (
+                    <div style={{ marginTop: '8px' }}>
+                      <img
+                        src={formData.imageUrl || selectedImageUrl}
+                        alt="Selected"
+                        style={{
+                          width: '100px',
+                          height: '60px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                          border: '1px solid #ddd'
+                        }}
+                      />
+                    </div>
+                  )}
+                  {imageSearchResults.length > 0 && (
+                    <div style={{ marginTop: '8px', maxHeight: '240px', overflowY: 'auto' }}>
+                      <div style={{ fontSize: '12px', marginBottom: '4px', color: '#666' }}>Select an image:</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '6px' }}>
+                        {imageSearchResults.slice(0, 6).map((url, index) => (
+                          <div key={index} style={{ position: 'relative', borderRadius: '4px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}>
+                            <img
+                              src={url}
+                              alt={`Option ${index + 1}`}
+                              style={{ width: '80px', height: '60px', objectFit: 'cover' }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleImageSelect(url)}
+                              style={{
+                                position: 'absolute',
+                                bottom: '2px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                padding: '2px 6px',
+                                fontSize: '10px',
+                                backgroundColor: '#4CAF50',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '3px',
+                                cursor: 'pointer',
+                                opacity: 0.9
+                              }}
+                            >
+                              Select
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setImageSearchResults([])}
+                        style={{
+                          marginTop: '4px',
+                          padding: '4px 8px',
+                          backgroundColor: '#f0f0f0',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '11px'
+                        }}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Description */}

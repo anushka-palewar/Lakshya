@@ -8,10 +8,12 @@ import sp.main.DreamWeb.dto.DreamResponse;
 import sp.main.DreamWeb.dto.MilestoneRequest;
 import sp.main.DreamWeb.dto.MilestoneResponse;
 import sp.main.DreamWeb.service.DreamService;
-
-import java.util.List;
+import sp.main.DreamWeb.service.ImageService;
 import sp.main.DreamWeb.dto.MilestoneSuggestionRequest;
 import sp.main.DreamWeb.service.MilestoneService;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dreams")
@@ -20,6 +22,7 @@ public class DreamController {
 
     private final DreamService service;
     private final MilestoneService milestoneService;
+    private final ImageService imageService;
 
     @PostMapping
     public ResponseEntity<DreamResponse> saveDream(@RequestBody DreamRequest request) {
@@ -66,6 +69,24 @@ public class DreamController {
                request.getDreamDescription()
            );
            return ResponseEntity.ok(suggestions);
+       }
+
+       @PostMapping("/search-images")
+       public ResponseEntity<List<String>> searchImages(@RequestBody Map<String, String> request) {
+           String title = request.get("title");
+           String description = request.get("description");
+           String category = request.get("category");
+           String custom = request.get("customQuery");
+           List<String> imageUrls = imageService.searchDreamImages(title, description, category, custom);
+           return ResponseEntity.ok(imageUrls);
+       }
+
+       @PostMapping("/generate-image")
+       public ResponseEntity<Map<String, String>> generateImage(@RequestBody Map<String, String> request) {
+           String title = request.get("title");
+           String description = request.get("description");
+           String imageUrl = imageService.generateDreamImage(title, description);
+           return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
        }
 
        // ===== MILESTONE ENDPOINTS =====

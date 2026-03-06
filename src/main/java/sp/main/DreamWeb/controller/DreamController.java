@@ -7,8 +7,10 @@ import sp.main.DreamWeb.dto.DreamRequest;
 import sp.main.DreamWeb.dto.DreamResponse;
 import sp.main.DreamWeb.dto.MilestoneRequest;
 import sp.main.DreamWeb.dto.MilestoneResponse;
+import sp.main.DreamWeb.dto.VisionBoardResponse;
 import sp.main.DreamWeb.service.DreamService;
 import sp.main.DreamWeb.service.ImageService;
+import sp.main.DreamWeb.service.VisionBoardService;
 import sp.main.DreamWeb.dto.MilestoneSuggestionRequest;
 import sp.main.DreamWeb.service.MilestoneService;
 
@@ -23,6 +25,7 @@ public class DreamController {
     private final DreamService service;
     private final MilestoneService milestoneService;
     private final ImageService imageService;
+    private final VisionBoardService visionBoardService;
 
     @PostMapping
     public ResponseEntity<DreamResponse> saveDream(@RequestBody DreamRequest request) {
@@ -60,6 +63,32 @@ public class DreamController {
     public ResponseEntity<DreamResponse> getDailyFocusDream() {
         DreamResponse dailyFocus = service.getDailyFocusDream();
         return dailyFocus != null ? ResponseEntity.ok(dailyFocus) : ResponseEntity.noContent().build();
+    }
+
+    // ===== VISION BOARD ENDPOINTS =====
+
+    @GetMapping("/vision-board/generate")
+    public ResponseEntity<VisionBoardResponse> generateVisionBoard(
+            @RequestParam(defaultValue = "false") boolean forceRegenerate) {
+        try {
+            VisionBoardResponse response = visionBoardService.generateVisionBoard(forceRegenerate);
+            if (response == null) {
+                return ResponseEntity.status(500).body(null);
+            }
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            // Return 400 with error message
+            throw new IllegalArgumentException("Vision Board Error: " + e.getMessage());
+        } catch (Exception e) {
+            // Return 500 for unexpected errors
+            throw new RuntimeException("Unexpected error generating vision board: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/vision-board/clear-cache")
+    public ResponseEntity<Void> clearVisionBoardCache() {
+        visionBoardService.clearCache();
+        return ResponseEntity.noContent().build();
     }
 
        @PostMapping("/suggest-milestones")

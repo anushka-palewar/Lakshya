@@ -42,8 +42,8 @@ const VisionGallery = () => {
     }, []);
 
     const filteredDreams = dreams.filter(dream => {
-        const matchesSearch = dream.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            dream.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = (dream.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+            (dream.description?.toLowerCase() || '').includes(searchQuery.toLowerCase());
         const matchesFilter = filter === 'all' || (filter === 'achieved' ? dream.isAchieved : !dream.isAchieved);
         return matchesSearch && matchesFilter;
     });
@@ -148,92 +148,92 @@ const VisionGallery = () => {
                     </motion.div>
                 </div>
 
-            {/* Gallery Grid */}
-            <div className="max-w-7xl mx-auto">
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-60 gap-8">
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                            className="text-zen-gold"
-                        >
-                            <Sparkles size={64} className="opacity-20" />
-                        </motion.div>
-                        <p className="text-[10px] uppercase tracking-[0.8em] text-charcoal/20 font-black animate-pulse">Syncing Visual Frequencies...</p>
-                    </div>
-                ) : (
-                    <div className="columns-1 md:columns-2 lg:columns-3 gap-10 space-y-10">
-                        {filteredDreams.map((dream, idx) => (
+                {/* Gallery Grid */}
+                <div className="max-w-7xl mx-auto">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-60 gap-8">
                             <motion.div
-                                key={dream.id}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.05 }}
-                                whileHover={{ scale: 1.02 }}
-                                className="break-inside-avoid relative group rounded-[48px] overflow-hidden bg-white border border-charcoal/5 shadow-md hover:shadow-2xl transition-all duration-700 cursor-pointer"
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                                className="text-zen-gold"
                             >
-                                <div className="aspect-[4/5] overflow-hidden relative">
-                                    <motion.img
-                                        src={dream.imageUrl || 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&q=80'}
-                                        className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"
-                                        alt={dream.name}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 p-12 flex flex-col justify-end">
-                                        <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700 ease-out">
-                                            <span className="text-[9px] uppercase tracking-[0.5em] text-zen-gold font-black mb-4 block">{dream.category || 'Vision'}</span>
-                                            <h3 className="heading-serif text-4xl text-white mb-4 tracking-tight leading-tight">{dream.name}</h3>
-                                            <p className="text-white/60 text-xs font-light leading-relaxed mb-6 line-clamp-3">
-                                                {dream.description}
-                                            </p>
-                                            <div className="flex items-center gap-4 pt-6 border-t border-white/10">
-                                                <div className="flex items-center gap-2 text-white/40">
-                                                    <Calendar size={14} />
-                                                    <span className="text-[9px] uppercase tracking-widest leading-none">{new Date(dream.dueDate).getFullYear()}</span>
+                                <Sparkles size={64} className="opacity-20" />
+                            </motion.div>
+                            <p className="text-[10px] uppercase tracking-[0.8em] text-charcoal/20 font-black animate-pulse">Syncing Visual Frequencies...</p>
+                        </div>
+                    ) : (
+                        <div className="columns-1 md:columns-2 lg:columns-3 gap-10 space-y-10">
+                            {filteredDreams.map((dream, idx) => (
+                                <motion.div
+                                    key={dream.id}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    whileHover={{ scale: 1.02 }}
+                                    className="break-inside-avoid relative group rounded-[48px] overflow-hidden bg-white border border-charcoal/5 shadow-md hover:shadow-2xl transition-all duration-700 cursor-pointer"
+                                >
+                                    <div className="aspect-[4/5] overflow-hidden relative">
+                                        <motion.img
+                                            src={dream.imageUrl || 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&q=80'}
+                                            className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"
+                                            alt={dream.name}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 p-12 flex flex-col justify-end">
+                                            <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700 ease-out">
+                                                <span className="text-[9px] uppercase tracking-[0.5em] text-zen-gold font-black mb-4 block">{dream.category || 'Vision'}</span>
+                                                <h3 className="heading-serif text-4xl text-white mb-4 tracking-tight leading-tight">{dream.name}</h3>
+                                                <p className="text-white/60 text-xs font-light leading-relaxed mb-6 line-clamp-3">
+                                                    {dream.description}
+                                                </p>
+                                                <div className="flex items-center gap-4 pt-6 border-t border-white/10">
+                                                    <div className="flex items-center gap-2 text-white/40">
+                                                        <Calendar size={14} />
+                                                        <span className="text-[9px] uppercase tracking-widest leading-none">{new Date(dream.dueDate).getFullYear()}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        {/* Status Badge */}
+                                        <div className="absolute top-10 right-10 flex items-center gap-3 px-5 py-2.5 bg-white/90 backdrop-blur-xl rounded-full border border-charcoal/5 shadow-sm">
+                                            <div className={`w-2 h-2 rounded-full ${dream.isAchieved ? 'bg-zen-gold' : 'bg-charcoal/20'}`} />
+                                            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-charcoal/40">
+                                                {dream.isAchieved ? 'Manifested' : 'Alignment'}
+                                            </span>
+                                        </div>
                                     </div>
-
-                                    {/* Status Badge */}
-                                    <div className="absolute top-10 right-10 flex items-center gap-3 px-5 py-2.5 bg-white/90 backdrop-blur-xl rounded-full border border-charcoal/5 shadow-sm">
-                                        <div className={`w-2 h-2 rounded-full ${dream.isAchieved ? 'bg-zen-gold' : 'bg-charcoal/20'}`} />
-                                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-charcoal/40">
-                                            {dream.isAchieved ? 'Manifested' : 'Alignment'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                )}
-
-                {!loading && filteredDreams.length === 0 && (
-                    <div className="text-center py-60 space-y-12">
-                        <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto text-charcoal/5 border border-charcoal/5 shadow-inner">
-                            <Search size={40} />
+                                </motion.div>
+                            ))}
                         </div>
-                        <div className="space-y-4">
-                            <h3 className="heading-serif text-5xl text-charcoal/20 italic">No frequencies identified</h3>
-                            <p className="text-[10px] uppercase tracking-[0.6em] text-charcoal/10 font-black">Adjust your sensory filters</p>
-                        </div>
-                        <button
-                            onClick={() => { setSearchQuery(''); setFilter('all'); }}
-                            className="px-10 py-4 bg-white border border-charcoal/5 text-zen-gold text-[10px] uppercase tracking-[0.5em] font-black hover:bg-zen-gold hover:text-white transition-all rounded-full shadow-sm"
-                        >
-                            Reset Parameters
-                        </button>
-                    </div>
-                )}
-            </div>
+                    )}
 
-            {/* Minimal Footer */}
-            <div className="mt-40 max-w-7xl mx-auto border-t border-charcoal/5 pt-16 flex flex-col md:flex-row justify-between items-center gap-8 opacity-40">
-                <div className="flex items-center gap-4">
-                    <ShieldCheck size={16} className="text-zen-gold" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.4em]">Vault Protection Enabled</span>
+                    {!loading && filteredDreams.length === 0 && (
+                        <div className="text-center py-60 space-y-12">
+                            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto text-charcoal/5 border border-charcoal/5 shadow-inner">
+                                <Search size={40} />
+                            </div>
+                            <div className="space-y-4">
+                                <h3 className="heading-serif text-5xl text-charcoal/20 italic">No frequencies identified</h3>
+                                <p className="text-[10px] uppercase tracking-[0.6em] text-charcoal/10 font-black">Adjust your sensory filters</p>
+                            </div>
+                            <button
+                                onClick={() => { setSearchQuery(''); setFilter('all'); }}
+                                className="px-10 py-4 bg-white border border-charcoal/5 text-zen-gold text-[10px] uppercase tracking-[0.5em] font-black hover:bg-zen-gold hover:text-white transition-all rounded-full shadow-sm"
+                            >
+                                Reset Parameters
+                            </button>
+                        </div>
+                    )}
                 </div>
-                <p className="text-[9px] font-black uppercase tracking-[0.6em]">Sankalp AI — Archive 2026</p>
-            </div>
+
+                {/* Minimal Footer */}
+                <div className="mt-40 max-w-7xl mx-auto border-t border-charcoal/5 pt-16 flex flex-col md:flex-row justify-between items-center gap-8 opacity-40">
+                    <div className="flex items-center gap-4">
+                        <ShieldCheck size={16} className="text-zen-gold" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.4em]">Vault Protection Enabled</span>
+                    </div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.6em]">Sankalp AI — Archive 2026</p>
+                </div>
             </div>
         </div>
     );

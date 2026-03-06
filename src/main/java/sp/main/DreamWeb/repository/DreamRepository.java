@@ -8,11 +8,17 @@ import sp.main.DreamWeb.model.Dream;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
 public interface DreamRepository extends JpaRepository<Dream, Long> {
-    List<Dream> findAllByUserId(Long userId);
+    
+    @Query("SELECT d FROM Dream d WHERE d.user.id = :userId ORDER BY d.createdAt DESC")
+    List<Dream> findAllByUserId(@Param("userId") Long userId);
+
+    @Query(value = "SELECT id, name, description, image_url, priority, category FROM dreams WHERE user_id = :userId AND image_url IS NOT NULL AND image_url != '' ORDER BY CASE WHEN priority = 'High' THEN 1 WHEN priority = 'Medium' THEN 2 ELSE 3 END ASC, created_at DESC", nativeQuery = true)
+    List<Map<String, Object>> findDreamsWithImages(@Param("userId") Long userId);
 
     @Query(value = "SELECT * FROM dreams d " +
             "WHERE d.user_id = :userId " +

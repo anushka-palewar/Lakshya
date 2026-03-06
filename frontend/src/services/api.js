@@ -107,6 +107,11 @@ export const dreamService = {
         title,
         description
     }),
+    // Vision Board
+    generateVisionBoard: (forceRegenerate = false) => api.get('/dreams/vision-board/generate', {
+        params: { forceRegenerate }
+    }),
+    clearVisionBoardCache: () => api.post('/dreams/vision-board/clear-cache'),
     // Milestone CRUD
     getMilestones: (dreamId) => api.get(`/dreams/${dreamId}/milestones`),
     getMilestone: (dreamId, milestoneId) => api.get(`/dreams/${dreamId}/milestones/${milestoneId}`),

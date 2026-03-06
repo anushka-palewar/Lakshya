@@ -3,6 +3,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import VisionGallery from './components/Gallery/VisionGallery';
+import VisionBoardPage from './components/Gallery/VisionBoardPage';
 import ManifestationPage from './components/Manifestation/ManifestationPage';
 import DreamsListPage from './components/Dreams/DreamsListPage';
 import DreamFormPage from './components/Dreams/DreamFormPage';
@@ -43,6 +44,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <VisionGallery />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/vision-board"
+            element={
+              <ProtectedRoute>
+                <VisionBoardPage />
               </ProtectedRoute>
             }
           />

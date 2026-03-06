@@ -21,12 +21,19 @@ jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970 # 256-bit secret
   expiration: 86400000 # 24 hours in milliseconds
 
-# API Keys for image services
+# API Keys for image services (optional - will use fallback images if not configured)
 unsplash:
   access:
-    key:  ${QUbmtX8HAtZxO1clJ7EcoPW7oBqjNyz1rPD-dODrRxc}
+    key: "" # Add your Unsplash API key here if needed
 
 openai:
   api:
-    key:  ${OPENAI_API_KEY}
+    key: "" # Add your OpenAI API key here if needed
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    sp.main.DreamWeb: DEBUG
+    org.springframework.security: DEBUG
 

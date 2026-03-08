@@ -109,6 +109,82 @@
   margin-top: 40px;
 }
 
+.vision-board-initial-msg {
+  font-size: 1.2rem;
+  color: #ffd700;
+  margin-top: 20px;
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Board Display - Phase 4 Improvements */
+.vision-board-display {
+  position: relative;
+  max-width: 1000px;
+  /* Large container */
+  margin: 0 auto;
+  /* Centered */
+  border-radius: 24px;
+  /* Rounded corners */
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+  /* Soft strong shadow */
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  aspect-ratio: 1 / 1;
+}
+
+.vision-board-display:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 50px 120px rgba(0, 0, 0, 0.9);
+}
+
+.vision-board-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Responsive sizing */
+  display: block;
+}
+
+/* Error Actions */
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.error-banner {
+  background: rgba(255, 59, 48, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  color: #ff6b6b;
+}
+
+/* Controls */
+.vision-board-controls {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
 .control-btn {
   display: flex;
   align-items: center;
@@ -185,4 +261,105 @@
     font-size: 1.1rem;
     padding: 16px;
   }
+}
+
+/* Mode Selection Options */
+.vision-board-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin: 40px 0;
+}
+
+.option-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.option-card:hover {
+  transform: translateY(-10px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #ffd700;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.option-icon {
+  font-size: 4rem;
+  margin-bottom: 10px;
+}
+
+.option-card h3 {
+  font-size: 1.8rem;
+  color: #ffd700;
+}
+
+.option-card p {
+  color: #b0b0b0;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* Board Display */
+.vision-board-display {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  border: 5px solid rgba(255, 215, 0, 0.3);
+  transition: transform 0.5s ease;
+}
+
+.vision-board-display:hover {
+  transform: scale(1.01);
+}
+
+.vision-board-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.vision-board-overlay-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 40px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+  pointer-events: none;
+}
+
+.vision-board-overlay-text h2 {
+  font-size: 3rem;
+  margin: 0;
+  letter-spacing: 5px;
+  color: white;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.vision-board-overlay-text p {
+  font-size: 1rem;
+  letter-spacing: 3px;
+  color: #ffd700;
+  margin: 5px 0 0 0;
+  font-weight: 600;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #ffd700;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 10px;
+  font-weight: 600;
 }

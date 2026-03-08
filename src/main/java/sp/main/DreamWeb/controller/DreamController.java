@@ -3,6 +3,8 @@ package sp.main.DreamWeb.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import sp.main.DreamWeb.dto.DreamRequest;
 import sp.main.DreamWeb.dto.DreamResponse;
 import sp.main.DreamWeb.dto.MilestoneRequest;
@@ -69,19 +71,20 @@ public class DreamController {
 
     @GetMapping("/vision-board/generate")
     public ResponseEntity<VisionBoardResponse> generateVisionBoard(
+            @RequestParam(defaultValue = "collage") String mode,
             @RequestParam(defaultValue = "false") boolean forceRegenerate) {
         try {
-            VisionBoardResponse response = visionBoardService.generateVisionBoard(forceRegenerate);
+            VisionBoardResponse response = visionBoardService.generateVisionBoard(mode, forceRegenerate);
             if (response == null) {
                 return ResponseEntity.status(500).body(null);
             }
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             // Return 400 with error message
-            throw new IllegalArgumentException("Vision Board Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
             // Return 500 for unexpected errors
-            throw new RuntimeException("Unexpected error generating vision board: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(null);
         }
     }
 
@@ -91,67 +94,66 @@ public class DreamController {
         return ResponseEntity.noContent().build();
     }
 
-       @PostMapping("/suggest-milestones")
-       public ResponseEntity<List<String>> suggestMilestones(@RequestBody MilestoneSuggestionRequest request) {
-           List<String> suggestions = milestoneService.generateMilestoneSuggestions(
-               request.getDreamTitle(),
-               request.getDreamDescription()
-           );
-           return ResponseEntity.ok(suggestions);
-       }
+    @PostMapping("/suggest-milestones")
+    public ResponseEntity<List<String>> suggestMilestones(@RequestBody MilestoneSuggestionRequest request) {
+        List<String> suggestions = milestoneService.generateMilestoneSuggestions(
+                request.getDreamTitle(),
+                request.getDreamDescription());
+        return ResponseEntity.ok(suggestions);
+    }
 
-       @PostMapping("/search-images")
-       public ResponseEntity<List<String>> searchImages(@RequestBody Map<String, String> request) {
-           String title = request.get("title");
-           String description = request.get("description");
-           String category = request.get("category");
-           String custom = request.get("customQuery");
-           List<String> imageUrls = imageService.searchDreamImages(title, description, category, custom);
-           return ResponseEntity.ok(imageUrls);
-       }
+    @PostMapping("/search-images")
+    public ResponseEntity<List<String>> searchImages(@RequestBody Map<String, String> request) {
+        String title = request.get("title");
+        String description = request.get("description");
+        String category = request.get("category");
+        String custom = request.get("customQuery");
+        List<String> imageUrls = imageService.searchDreamImages(title, description, category, custom);
+        return ResponseEntity.ok(imageUrls);
+    }
 
-       @PostMapping("/generate-image")
-       public ResponseEntity<Map<String, String>> generateImage(@RequestBody Map<String, String> request) {
-           String title = request.get("title");
-           String description = request.get("description");
-           String imageUrl = imageService.generateDreamImage(title, description);
-           return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
-       }
+    @PostMapping("/generate-image")
+    public ResponseEntity<Map<String, String>> generateImage(@RequestBody Map<String, String> request) {
+        String title = request.get("title");
+        String description = request.get("description");
+        String imageUrl = imageService.generateDreamImage(title, description);
+        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+    }
 
-       // ===== MILESTONE ENDPOINTS =====
+    // ===== MILESTONE ENDPOINTS =====
 
-       @PostMapping("/{dreamId}/milestones")
-       public ResponseEntity<MilestoneResponse> createMilestone(
-               @PathVariable Long dreamId,
-               @RequestBody MilestoneRequest request) {
-           return ResponseEntity.ok(service.saveMilestone(dreamId, request));
-       }
+    @PostMapping("/{dreamId}/milestones")
+    public ResponseEntity<MilestoneResponse> createMilestone(
+            @PathVariable Long dreamId,
+            @RequestBody MilestoneRequest request) {
+        return ResponseEntity.ok(service.saveMilestone(dreamId, request));
+    }
 
-       @GetMapping("/{dreamId}/milestones")
-       public ResponseEntity<List<MilestoneResponse>> getMilestones(@PathVariable Long dreamId) {
-           return ResponseEntity.ok(service.getMilestones(dreamId));
-       }
+    @GetMapping("/{dreamId}/milestones")
+    public ResponseEntity<List<MilestoneResponse>> getMilestones(@PathVariable Long dreamId) {
+        return ResponseEntity.ok(service.getMilestones(dreamId));
+    }
 
-       @GetMapping("/{dreamId}/milestones/{milestoneId}")
-       public ResponseEntity<MilestoneResponse> getMilestone(
-               @PathVariable Long dreamId,
-               @PathVariable Long milestoneId) {
-           return ResponseEntity.ok(service.getMilestone(dreamId, milestoneId));
-       }
+    @GetMapping("/{dreamId}/milestones/{milestoneId}")
+    public ResponseEntity<MilestoneResponse> getMilestone(
+            @PathVariable Long dreamId,
+            @PathVariable Long milestoneId) {
+        return ResponseEntity.ok(service.getMilestone(dreamId, milestoneId));
+    }
 
-       @PutMapping("/{dreamId}/milestones/{milestoneId}")
-       public ResponseEntity<MilestoneResponse> updateMilestone(
-               @PathVariable Long dreamId,
-               @PathVariable Long milestoneId,
-               @RequestBody MilestoneRequest request) {
-           return ResponseEntity.ok(service.updateMilestone(dreamId, milestoneId, request));
-       }
+    @PutMapping("/{dreamId}/milestones/{milestoneId}")
+    public ResponseEntity<MilestoneResponse> updateMilestone(
+            @PathVariable Long dreamId,
+            @PathVariable Long milestoneId,
+            @RequestBody MilestoneRequest request) {
+        return ResponseEntity.ok(service.updateMilestone(dreamId, milestoneId, request));
+    }
 
-       @DeleteMapping("/{dreamId}/milestones/{milestoneId}")
-       public ResponseEntity<Void> deleteMilestone(
-               @PathVariable Long dreamId,
-               @PathVariable Long milestoneId) {
-           service.deleteMilestone(dreamId, milestoneId);
-           return ResponseEntity.noContent().build();
-       }
+    @DeleteMapping("/{dreamId}/milestones/{milestoneId}")
+    public ResponseEntity<Void> deleteMilestone(
+            @PathVariable Long dreamId,
+            @PathVariable Long milestoneId) {
+        service.deleteMilestone(dreamId, milestoneId);
+        return ResponseEntity.noContent().build();
+    }
 }

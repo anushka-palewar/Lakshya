@@ -37,6 +37,8 @@ export default function VisionBoardVisualizer({ visionBoard, onClose }) {
     "You have the power to manifest this vision.",
     "Breathe in your success. Exhale your doubts.",
     "Your dreams are calling. Answer them.",
+    "Your future is forming with every action you take.",
+    "Believe in the power of your vision.",
   ];
 
   const currentMessage = React.useMemo(() =>
@@ -56,31 +58,27 @@ export default function VisionBoardVisualizer({ visionBoard, onClose }) {
           <X size={28} />
         </button>
 
-        {/* Dream Images with Zoom Animation */}
+        {/* Dream Image with Zoom Animation */}
         <div className="visualizer-container">
-          {visionBoard.dreams.map((dream, idx) => (
-            <motion.div
-              key={dream.dreamId}
-              className="visualizer-dream-image"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{
-                opacity: 1,
-                scale: 1.05,
-              }}
-              transition={{
-                delay: idx * 0.2,
-                duration: 2,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              }}
-            >
-              <img
-                src={dream.imageUrl}
-                alt={dream.dreamTitle}
-                className="visualizer-image"
-              />
-            </motion.div>
-          ))}
+          <motion.div
+            className="visualizer-main-image-wrapper"
+            initial={{ scale: 1 }}
+            animate={{
+              scale: 1.1,
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              repeatType: 'reverse',
+              ease: "linear"
+            }}
+          >
+            <img
+              src={visionBoard.boardImageUrl}
+              alt="Vision Board"
+              className="visualizer-main-image"
+            />
+          </motion.div>
 
           {/* Gradient Overlay Background */}
           <div className="visualizer-gradient-bg"></div>

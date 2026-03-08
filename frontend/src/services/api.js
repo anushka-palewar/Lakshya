@@ -16,30 +16,30 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-                // dev debug removed
+        // dev debug removed
         return config;
     },
     (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    try {
-      console.error('[api] response error', err.response?.status, err.response?.data);
-      const status = err.response?.status;
-      const data = err.response?.data;
-      const message = data && typeof data === 'object' ? data.error : data;
-      // If backend indicates user not authenticated or unauthorized, clear local auth and redirect to login
-      if (status === 401 || status === 403 || (status === 400 && message && String(message).toLowerCase().includes('not authenticated'))) {
+    (res) => res,
+    (err) => {
         try {
-          authService.logout();
-        } catch (e) {}
-        window.location.href = '/login';
-      }
-    } catch (e) {}
-    return Promise.reject(err);
-  }
+            console.error('[api] response error', err.response?.status, err.response?.data);
+            const status = err.response?.status;
+            const data = err.response?.data;
+            const message = data && typeof data === 'object' ? data.error : data;
+            // If backend indicates user not authenticated or unauthorized, clear local auth and redirect to login
+            if (status === 401 || status === 403 || (status === 400 && message && String(message).toLowerCase().includes('not authenticated'))) {
+                try {
+                    authService.logout();
+                } catch (e) { }
+                window.location.href = '/login';
+            }
+        } catch (e) { }
+        return Promise.reject(err);
+    }
 );
 
 export const authService = {
@@ -94,8 +94,8 @@ export const dreamService = {
     getDailySelection: () => api.get('/dreams/daily'),
     getDailyFocusDream: () => api.get('/dreams/daily-focus'),
     suggestMilestones: (dreamTitle, dreamDescription) => api.post('/dreams/suggest-milestones', {
-         dreamTitle,
-         dreamDescription
+        dreamTitle,
+        dreamDescription
     }),
     searchImages: (title, description, category, customQuery) => api.post('/dreams/search-images', {
         title,
@@ -108,8 +108,8 @@ export const dreamService = {
         description
     }),
     // Vision Board
-    generateVisionBoard: (forceRegenerate = false) => api.get('/dreams/vision-board/generate', {
-        params: { forceRegenerate }
+    generateVisionBoard: (mode = 'collage', forceRegenerate = false) => api.get('/dreams/vision-board/generate', {
+        params: { mode, forceRegenerate }
     }),
     clearVisionBoardCache: () => api.post('/dreams/vision-board/clear-cache'),
     // Milestone CRUD

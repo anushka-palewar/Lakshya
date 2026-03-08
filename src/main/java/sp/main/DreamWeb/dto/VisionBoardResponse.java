@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VisionBoardResponse {
-    
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -24,9 +24,11 @@ public class VisionBoardResponse {
         private String priority;
         private String category;
     }
-    
+
     private List<DreamImage> dreams;
     private String layout; // "side-by-side", "triangle", "grid-2x2", "collage"
+    private String boardImageUrl; // New field for the generated board
+    private String mode; // "collage" or "ai"
     private Long generatedAt;
     private String inspirationalMessage;
 }

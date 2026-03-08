@@ -1,0 +1,24 @@
+
+> startup_output.txt:82:Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'imageService': Injection of autowired dependencies failed
+  startup_output.txt:83:	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:84:	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:85:	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:86:	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:87:	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:88:	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:89:	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:90:	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:91:	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1606) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:92:	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1552) ~[spring-beans-6.2.3.jar:6.2.3]
+> startup_output.txt:96:Caused by: org.springframework.util.PlaceholderResolutionException: Could not resolve placeholder 'OPENAI_API_KEY' in value "${OPENAI_API_KEY}" <-- "${openai.api-key:}"
+  startup_output.txt:97:	at org.springframework.util.PlaceholderResolutionException.withValue(PlaceholderResolutionException.java:81) ~[spring-core-6.2.3.jar:6.2.3]
+  startup_output.txt:98:	at org.springframework.util.PlaceholderParser$ParsedValue.resolve(PlaceholderParser.java:423) ~[spring-core-6.2.3.jar:6.2.3]
+  startup_output.txt:99:	at org.springframework.util.PlaceholderParser.replacePlaceholders(PlaceholderParser.java:128) ~[spring-core-6.2.3.jar:6.2.3]
+  startup_output.txt:100:	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:118) ~[spring-core-6.2.3.jar:6.2.3]
+  startup_output.txt:101:	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:114) ~[spring-core-6.2.3.jar:6.2.3]
+  startup_output.txt:102:	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:255) ~[spring-core-6.2.3.jar:6.2.3]
+  startup_output.txt:103:	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:226) ~[spring-core-6.2.3.jar:6.2.3]
+  startup_output.txt:104:	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer.lambda$processProperties$0(PropertySourcesPlaceholderConfigurer.java:201) ~[spring-context-6.2.3.jar:6.2.3]
+  startup_output.txt:105:	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:971) ~[spring-beans-6.2.3.jar:6.2.3]
+  startup_output.txt:106:	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1574) ~[spring-beans-6.2.3.jar:6.2.3]
+

@@ -30,6 +30,10 @@ openai:
   api:
     key: ${OPENAI_API_KEY:} # Add your OpenAI API key here if needed
 
+gemini:
+  api:
+    key: ${GEMINI_API:} # Add your Gemini API key here
+
 cloudinary:
   cloud-name: dowwsjlvq
   api-key: ${CLOUDINARY_API_KEY:}

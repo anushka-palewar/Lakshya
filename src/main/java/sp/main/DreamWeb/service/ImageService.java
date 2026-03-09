@@ -31,6 +31,9 @@ public class ImageService {
     @Value("${openai.api.key:}")
     private String openaiApiKey;
 
+    @Value("${gemini.api.key:}")
+    private String geminiApiKey;
+
     /**
      * Search for images using Unsplash API based on dream title and description
      */
@@ -93,45 +96,148 @@ public class ImageService {
         return getSampleImages();
     }
 
-    /**
-     * Generate an AI image using OpenAI's DALL-E API
-     */
-    public String generateDreamImage(String title, String description) {
-        if (openaiApiKey == null || openaiApiKey.trim().isEmpty()) {
-            log.warn("OpenAI API key not configured, returning sample image");
-            return getSampleImage();
+    public Map<String, Object> generateComprehensiveDreamImages(String title, String description) {
+        log.info("Generating comprehensive dream images for: {}", title);
+        List<String> combinedResults = new ArrayList<>();
+
+        // 1. Generate one AI image variation from Gemini
+        List<String> aiImages = generateAIImages(title, description, 1);
+
+        // 2. Fetch Unsplash images using the dream name and description directly
+        List<String> unsplashImages = searchDreamImages(title, description, null, null);
+
+        // Take up to 6 as requested
+        List<String> limitedUnsplash = unsplashImages.stream()
+                .limit(6)
+                .collect(Collectors.toList());
+
+        // Combine results: AI image is always FIRST
+        combinedResults.addAll(aiImages);
+        combinedResults.addAll(limitedUnsplash);
+
+        log.info("Total images generated: {} (AI: {}, Unsplash: {})", combinedResults.size(), aiImages.size(),
+                limitedUnsplash.size());
+
+        return Map.of(
+                "images", combinedResults,
+                "aiGeneratedCount", aiImages.size(),
+                "unsplashCount", limitedUnsplash.size());
+    }
+
+    private String generateSmartSearchQuery(String title, String description) {
+        if (geminiApiKey == null || geminiApiKey.trim().isEmpty()) {
+            return title; // Fallback to title
         }
 
         try {
-            String prompt = buildAIPrompt(title, description);
+            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
+                    + geminiApiKey;
 
-            String url = "https://api.openai.com/v1/images/generations";
+            String prompt = String.format(
+                    "Convert the following dream into a short Unsplash image search query.\n\n" +
+                            "Dream: %s\n" +
+                            "Description: %s\n\n" +
+                            "Return only one short search phrase.",
+                    title, (description != null ? description : ""));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + openaiApiKey);
 
-            Map<String, Object> requestBody = Map.of(
-                    "prompt", prompt,
-                    "n", 1,
-                    "size", "512x512");
+            Map<String, Object> part = Map.of("text", prompt);
+            Map<String, Object> content = Map.of("parts", List.of(part));
+            Map<String, Object> requestBody = Map.of("contents", List.of(content));
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
 
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
+                if (candidates != null && !candidates.isEmpty()) {
+                    Map<String, Object> contentMap = (Map<String, Object>) candidates.get(0).get("content");
+                    if (contentMap != null) {
+                        List<Map<String, Object>> parts = (List<Map<String, Object>>) contentMap.get("parts");
+                        if (parts != null && !parts.isEmpty()) {
+                            return (String) parts.get(0).get("text").toString().trim();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error generating smart search query via Gemini", e);
+        }
+        return title;
+    }
+
+    private List<String> generateAIImages(String title, String description, int count) {
+        List<String> results = new ArrayList<>();
+        if (geminiApiKey == null || geminiApiKey.trim().isEmpty()) {
+            return results;
+        }
+
+        try {
+            String prompt = String.format(
+                    "Create a realistic image of %s reflecting the following context: %s. " +
+                            "Atmosphere should be inspiring and realistic.",
+                    title, (description != null ? description : ""));
+
+            String url = "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key="
+                    + geminiApiKey;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> instance = Map.of("prompt", prompt);
+            Map<String, Object> parameters = Map.of("sampleCount", count);
+            Map<String, Object> requestBody = Map.of(
+                    "instances", List.of(instance),
+                    "parameters", parameters);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<Map<String, Object>> predictions = (List<Map<String, Object>>) response.getBody()
+                        .get("predictions");
+                if (predictions != null) {
+                    for (Map<String, Object> pred : predictions) {
+                        String mimeType = (String) pred.get("mimeType");
+                        String bytesBase64Encoded = (String) pred.get("bytesBase64Encoded");
+                        results.add("data:" + (mimeType != null ? mimeType : "image/png") + ";base64,"
+                                + bytesBase64Encoded);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error generating AI images via Gemini", e);
+        }
+        return results;
+    }
+
+    /**
+     * Fallback to OpenAI if needed (kept for compatibility)
+     */
+    public String generateDreamImage(String title, String description) {
+        if (openaiApiKey == null || openaiApiKey.trim().isEmpty()) {
+            return getSampleImage();
+        }
+        try {
+            String prompt = buildAIPrompt(title, description);
+            String url = "https://api.openai.com/v1/images/generations";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + openaiApiKey);
+            Map<String, Object> requestBody = Map.of("prompt", prompt, "n", 1, "size", "512x512");
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 List<Map<String, Object>> data = (List<Map<String, Object>>) response.getBody().get("data");
                 if (data != null && !data.isEmpty()) {
                     return (String) data.get(0).get("url");
                 }
             }
-        } catch (RestClientException e) {
-            log.error("Error calling OpenAI API", e);
         } catch (Exception e) {
-            log.error("Unexpected error in AI image generation", e);
+            log.error("Error in OpenAI generation", e);
         }
-
-        // Fallback to sample image if API fails
         return getSampleImage();
     }
 
@@ -190,7 +296,8 @@ public class ImageService {
     private static final Set<String> STOP_WORDS = Set.of(
             "a", "the", "to", "my", "dream", "of", "for", "in", "on", "about",
             "and", "or", "is", "it", "this", "that", "with", "i", "want", "will",
-            "be", "at", "from", "by", "as", "an", "into", "up", "down", "over");
+            "be", "at", "from", "by", "as", "an", "into", "up", "down", "over",
+            "future", "inspiration", "vision", "manifest", "goal");
 
     private String buildSearchQuery(String title, String description, String category, String custom) {
         if (custom != null && !custom.trim().isEmpty()) {
@@ -198,40 +305,36 @@ public class ImageService {
         }
 
         List<String> keywords = new ArrayList<>();
+        String lowTitle = title != null ? title.toLowerCase() : "";
 
-        // 1. Title is primary. Extract up to 3 core meaningful words.
+        // 1. Extract core keywords from title (Primary source)
         if (title != null && !title.trim().isEmpty()) {
-            String[] titleWords = title.toLowerCase().split("\\s+");
-            Arrays.stream(titleWords)
-                    .filter(w -> !STOP_WORDS.contains(w))
-                    .filter(w -> w.length() > 2)
-                    .limit(3)
-                    .forEach(keywords::add);
+            String[] titleWords = lowTitle.split("\\s+");
+            for (String word : titleWords) {
+                String cleanWord = word.replaceAll("[^a-zA-Z0-9]", "");
+                if (cleanWord.length() > 2 && !STOP_WORDS.contains(cleanWord)) {
+                    keywords.add(cleanWord);
+                }
+            }
         }
 
-        // 2. Add Category context if keywords are sparse
-        if (keywords.size() < 2 && category != null && !category.trim().isEmpty()
-                && !category.equalsIgnoreCase("Personal")) {
-            keywords.add(category.toLowerCase());
+        // 2. Append useful context from description if present
+        if (description != null && !description.trim().isEmpty()) {
+            String lowDesc = description.toLowerCase();
+            Set<String> contextWords = Set.of("cafe", "restaurant", "building", "hostel", "gym", "office", "house",
+                    "exterior", "architecture");
+            for (String word : contextWords) {
+                if (lowDesc.contains(word) && !keywords.contains(word)) {
+                    keywords.add(word);
+                }
+            }
         }
 
-        // 3. Description fallback
-        if (keywords.size() < 2 && description != null && !description.trim().isEmpty()) {
-            String[] descWords = description.toLowerCase().split("\\s+");
-            Arrays.stream(descWords)
-                    .filter(w -> !STOP_WORDS.contains(w))
-                    .filter(w -> w.length() > 3)
-                    .limit(2)
-                    .forEach(keywords::add);
+        if (keywords.isEmpty()) {
+            return "lifestyle+success";
         }
 
-        String result = String.join("+", keywords);
-
-        if (result.isEmpty()) {
-            return "inspirational+lifestyle";
-        }
-
-        return result.replaceAll("[^a-zA-Z0-9+]", "");
+        return String.join("+", keywords);
     }
 
     private String buildAIPrompt(String title, String description) {

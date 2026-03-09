@@ -113,11 +113,11 @@ public class DreamController {
     }
 
     @PostMapping("/generate-image")
-    public ResponseEntity<Map<String, String>> generateImage(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> generateImage(@RequestBody Map<String, String> request) {
         String title = request.get("title");
         String description = request.get("description");
-        String imageUrl = imageService.generateDreamImage(title, description);
-        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+        Map<String, Object> results = imageService.generateComprehensiveDreamImages(title, description);
+        return ResponseEntity.ok(results);
     }
 
     // ===== MILESTONE ENDPOINTS =====

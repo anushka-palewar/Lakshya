@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { dreamService } from '../../services/api';
 import { useToast } from '../Shared/ToastContext';
-import { Sparkles, X, CheckCircle2 } from 'lucide-react';
+import { Sparkles, X, CheckCircle2, Mic } from 'lucide-react';
 import FocusMode from './FocusMode';
+import FutureYouVoiceNotes from '../FutureVoice/FutureYouVoiceNotes';
 
 export default function DreamFormPage() {
   const { id } = useParams();
@@ -21,16 +22,18 @@ export default function DreamFormPage() {
     isAchieved: false,
   });
   const [loading, setLoading] = useState(false);
-    const [milestones, setMilestones] = useState([]);
-    const [suggestedMilestones, setSuggestedMilestones] = useState([]);
-    const [suggestLoading, setSuggestLoading] = useState(false);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [selectedSuggestions, setSelectedSuggestions] = useState(new Set());
+  const [milestones, setMilestones] = useState([]);
+  const [suggestedMilestones, setSuggestedMilestones] = useState([]);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestions, setSelectedSuggestions] = useState(new Set());
   const [imageSearchResults, setImageSearchResults] = useState([]);
   const [imageSearchLoading, setImageSearchLoading] = useState(false);
   const [imageGenerateLoading, setImageGenerateLoading] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState('');
   const [manualSearch, setManualSearch] = useState('');
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [voiceNoteBlob, setVoiceNoteBlob] = useState(null);
   const manualTimer = React.useRef(null);
   const handleGenerateMilestones = async () => {
     if (!formData.name.trim()) {
@@ -106,24 +109,28 @@ export default function DreamFormPage() {
   };
 
   const handleImageGenerate = async () => {
-    if (!formData.name.trim() && !formData.description.trim()) {
-      addToast('Please enter a dream name or description first', 'error');
+    if (!formData.name.trim()) {
+      addToast('Please enter a dream name first.', 'error');
       return;
     }
     setImageGenerateLoading(true);
+    setImageSearchResults([]);
     try {
       const res = await dreamService.generateImage(formData.name, formData.description);
-      const generatedUrl = res.data?.imageUrl;
-      if (generatedUrl) {
-        setSelectedImageUrl(generatedUrl);
-        setFormData(prev => ({ ...prev, imageUrl: generatedUrl }));
-        addToast('AI image generated successfully!', 'success');
+      const images = res.data?.images || [];
+
+      if (images.length > 0) {
+        setImageSearchResults(images);
+        // Automatically select the first generated image for convenience
+        const firstUrl = images[0];
+        setSelectedImageUrl(firstUrl);
+        setFormData(prev => ({ ...prev, imageUrl: firstUrl }));
+        addToast(`Found ${images.length} relevant images!`, 'success');
       } else {
-        addToast('Failed to generate image', 'error');
+        addToast('No images could be generated. Please try again.', 'error');
       }
     } catch (err) {
-      let msg = err.response?.data?.message || err.response?.data || err.message || 'Failed to generate image';
-      if (typeof msg === 'object') msg = JSON.stringify(msg);
+      let msg = 'Failed to generate dream images. Please try again.';
       addToast(msg, 'error');
     } finally {
       setImageGenerateLoading(false);
@@ -181,7 +188,8 @@ export default function DreamFormPage() {
         description: formData.description,
         category: formData.category,
         dueDate: formData.dueDate || null,
-        priority: formData.priority,        isAchieved: formData.isAchieved,      };
+        priority: formData.priority, isAchieved: formData.isAchieved,
+      };
       if (isEdit) {
         await dreamService.updateDream(id, payload);
         addToast('Dream updated', 'success');
@@ -274,7 +282,7 @@ export default function DreamFormPage() {
                     {imageGenerateLoading ? (
                       <>
                         <div style={{ width: '16px', height: '16px', border: '2px solid #666', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                        Generating...
+                        Generating dream image...
                       </>
                     ) : (
                       <>
@@ -326,13 +334,35 @@ export default function DreamFormPage() {
                   <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: '#666' }}>
                     Select an image:
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px' }}>
-                    {imageSearchResults.slice(0,6).map((url, index) => (
-                      <div key={index} style={{ position: 'relative', borderRadius: '6px', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
+                    {imageSearchResults.slice(0, 7).map((url, index) => (
+                      <div key={index} style={{
+                        position: 'relative',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        border: index < 1 ? '2px solid #6366f1' : 'none' // Highlight AI version
+                      }}>
+                        {index < 1 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '4px',
+                            right: '4px',
+                            zIndex: 2,
+                            backgroundColor: '#6366f1',
+                            color: 'white',
+                            fontSize: '10px',
+                            padding: '2px 6px',
+                            borderRadius: '10px',
+                            fontWeight: 'bold'
+                          }}>
+                            AI
+                          </div>
+                        )}
                         <img
                           src={url}
                           alt={`Result ${index + 1}`}
-                          style={{ width: '120px', height: '80px', objectFit: 'cover' }}
+                          style={{ width: '100%', height: '100px', objectFit: 'cover' }}
                         />
                         <button
                           type="button"
@@ -376,58 +406,58 @@ export default function DreamFormPage() {
               )}
             </div>
           </div>
-            <div className="form-group">
-              <label className="form-label">Milestones</label>
-              <button
-                type="button"
-                onClick={handleGenerateMilestones}
-                disabled={suggestLoading}
-                className="btn-primary"
-                style={{ marginBottom: '12px', opacity: suggestLoading ? 0.6 : 1 }}
-              >
-                {suggestLoading ? (
-                  <>
-                    <Sparkles size={16} style={{ marginRight: '8px', animation: 'spin 1s linear infinite' }} />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={16} style={{ marginRight: '8px' }} />
-                    ✨ Generate Smart Milestones
-                  </>
-                )}
-              </button>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {milestones.map((milestone, idx) => (
-                  <div
-                    key={idx}
+          <div className="form-group">
+            <label className="form-label">Milestones</label>
+            <button
+              type="button"
+              onClick={handleGenerateMilestones}
+              disabled={suggestLoading}
+              className="btn-primary"
+              style={{ marginBottom: '12px', opacity: suggestLoading ? 0.6 : 1 }}
+            >
+              {suggestLoading ? (
+                <>
+                  <Sparkles size={16} style={{ marginRight: '8px', animation: 'spin 1s linear infinite' }} />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles size={16} style={{ marginRight: '8px' }} />
+                  ✨ Generate Smart Milestones
+                </>
+              )}
+            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {milestones.map((milestone, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '10px',
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  <CheckCircle2 size={16} style={{ marginRight: '8px', color: '#4CAF50' }} />
+                  <span style={{ flex: 1 }}>{milestone}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeMilestone(idx)}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '10px',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
-                      fontSize: '14px'
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#999'
                     }}
                   >
-                    <CheckCircle2 size={16} style={{ marginRight: '8px', color: '#4CAF50' }} />
-                    <span style={{ flex: 1 }}>{milestone}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeMilestone(idx)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#999'
-                      }}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
             </div>
+          </div>
           <div className="form-group">
             <label className="form-label">Target Date</label>
             <input type="date" name="dueDate" value={formData.dueDate} onChange={handleChange} className="form-input" />
@@ -456,121 +486,159 @@ export default function DreamFormPage() {
               Dream Completed
             </label>
           </div>
-          <div className="form-group">
-            <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Saving...' : isEdit ? 'Update Dream' : 'Create Dream'}</button>
+          <div className="form-group" style={{ marginTop: '24px', borderTop: '1px solid #eee', paddingTop: '24px' }}>
+            <button
+              type="button"
+              onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+              className="btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                width: '100%',
+                justifyContent: 'center',
+                backgroundColor: showVoiceRecorder ? '#FFF9E6' : 'transparent',
+                borderColor: showVoiceRecorder ? '#F59E0B' : '#E5E7EB'
+              }}
+            >
+              <Mic size={18} className={showVoiceRecorder ? 'text-amber-500' : ''} />
+              {showVoiceRecorder ? 'Cancel Voice Note' : 'Add Recording for Future You'}
+            </button>
+
+            {showVoiceRecorder && (
+              <div style={{ marginTop: '16px' }}>
+                <FutureYouVoiceNotes
+                  dreamId={id || 'new-dream'}
+                  destinyDate={formData.dueDate || new Date().toISOString().split('T')[0]}
+                  onVoiceRecorded={(blob) => {
+                    setVoiceNoteBlob(blob);
+                    addToast('Voice note attached to dream', 'success');
+                  }}
+                />
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '12px', textAlign: 'center', fontStyle: 'italic' }}>
+                  This message will stay locked until your target date arrives.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="form-group" style={{ marginTop: '32px' }}>
+            <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', height: '56px', fontSize: '18px' }}>
+              {loading ? 'Saving...' : isEdit ? 'Update Dream' : 'Manifest Dream'}
+            </button>
           </div>
         </form>
       </div>
-        {showSuggestions && (
-          <>
+      {showSuggestions && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}
+            onClick={() => setShowSuggestions(false)}
+          >
             <div
               style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000
+                backgroundColor: 'white',
+                padding: '24px',
+                borderRadius: '12px',
+                maxWidth: '500px',
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)'
               }}
-              onClick={() => setShowSuggestions(false)}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div
-                style={{
-                  backgroundColor: 'white',
-                  padding: '24px',
-                  borderRadius: '12px',
-                  maxWidth: '500px',
-                  maxHeight: '80vh',
-                  overflowY: 'auto',
-                  boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)'
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>Select Milestones</h3>
-                  <button
-                    type="button"
-                    onClick={() => setShowSuggestions(false)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px' }}
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
-                <div style={{ marginBottom: '16px' }}>
-                  {suggestedMilestones.map((suggestion, idx) => (
-                    <label
-                      key={idx}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px',
-                        marginBottom: '8px',
-                        backgroundColor: selectedSuggestions.has(idx) ? '#e8f5e9' : '#f5f5f5',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        border: selectedSuggestions.has(idx) ? '2px solid #4CAF50' : '2px solid transparent'
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedSuggestions.has(idx)}
-                        onChange={() => toggleSuggestionSelection(idx)}
-                        style={{ marginRight: '12px', cursor: 'pointer' }}
-                      />
-                      <span style={{ fontSize: '14px' }}>{suggestion}</span>
-                    </label>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setShowSuggestions(false)}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>Select Milestones</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestions(false)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px' }}
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                {suggestedMilestones.map((suggestion, idx) => (
+                  <label
+                    key={idx}
                     style={{
-                      flex: 1,
-                      padding: '10px',
-                      backgroundColor: '#f0f0f0',
-                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '12px',
+                      marginBottom: '8px',
+                      backgroundColor: selectedSuggestions.has(idx) ? '#e8f5e9' : '#f5f5f5',
                       borderRadius: '6px',
                       cursor: 'pointer',
-                      fontSize: '14px'
+                      border: selectedSuggestions.has(idx) ? '2px solid #4CAF50' : '2px solid transparent'
                     }}
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAddSelectedMilestones}
-                    disabled={selectedSuggestions.size === 0}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      backgroundColor: selectedSuggestions.size === 0 ? '#ccc' : '#4CAF50',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: selectedSuggestions.size === 0 ? 'not-allowed' : 'pointer',
-                      fontSize: '14px'
-                    }}
-                  >
-                    Add Selected ({selectedSuggestions.size})
-                  </button>
-                </div>
+                    <input
+                      type="checkbox"
+                      checked={selectedSuggestions.has(idx)}
+                      onChange={() => toggleSuggestionSelection(idx)}
+                      style={{ marginRight: '12px', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontSize: '14px' }}>{suggestion}</span>
+                  </label>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestions(false)}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    backgroundColor: '#f0f0f0',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddSelectedMilestones}
+                  disabled={selectedSuggestions.size === 0}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    backgroundColor: selectedSuggestions.size === 0 ? '#ccc' : '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: selectedSuggestions.size === 0 ? 'not-allowed' : 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Add Selected ({selectedSuggestions.size})
+                </button>
               </div>
             </div>
-          </>
-        )}
-        {focusOpen && (
-          <FocusMode dream={{
-            id: id,
-            name: formData.name,
-            imageUrl: formData.imageUrl,
-            description: formData.description
-          }} onClose={() => setFocusOpen(false)} />
-        )}
+          </div>
+        </>
+      )}
+      {focusOpen && (
+        <FocusMode dream={{
+          id: id,
+          name: formData.name,
+          imageUrl: formData.imageUrl,
+          description: formData.description
+        }} onClose={() => setFocusOpen(false)} />
+      )}
     </section>
   );
 }

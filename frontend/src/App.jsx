@@ -11,6 +11,7 @@ import DreamDetailPage from './components/Dreams/DreamDetailPage';
 import GratitudePage from './components/Gratitude/GratitudePage';
 import FutureLetterPage from './components/FutureLetter/FutureLetterPage';
 import LifeAnalyticsPage from './components/Analytics/LifeAnalyticsPage';
+import VoiceNoteDemo from './components/FutureVoice/VoiceNoteDemo';
 import { authService } from './services/api';
 
 // Protected Route Component
@@ -125,6 +126,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <LifeAnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/voice-demo"
+            element={
+              <ProtectedRoute>
+                <VoiceNoteDemo />
               </ProtectedRoute>
             }
           />
